@@ -1,0 +1,132 @@
+[
+	{
+		"PointsPerAnswer": 10,
+		"Question": "Name something you might find in a teacher's desk.",
+		"Answers": [
+			{
+				"Answer": "Pens / Pencils",
+				"PeopleWithAnswer": 42
+			},
+			{
+				"Answer": "Apples / Snacks",
+				"PeopleWithAnswer": 23
+			},
+			{
+				"Answer": "Paperclips / Rubber bands",
+				"PeopleWithAnswer": 15
+			},
+			{
+				"Answer": "Grade book",
+				"PeopleWithAnswer": 11
+			},
+			{
+				"Answer": "Confiscated items / Toys",
+				"PeopleWithAnswer": 9
+			}
+		]
+	},
+	{
+		"PointsPerAnswer": 10,
+		"Question": "Name a place where people are expected to be quiet.",
+		"Answers": [
+			{
+				"Answer": "Library",
+				"PeopleWithAnswer": 54
+			},
+			{
+				"Answer": "Movie theater",
+				"PeopleWithAnswer": 21
+			},
+			{
+				"Answer": "Church / Place of worship",
+				"PeopleWithAnswer": 14
+			},
+			{
+				"Answer": "Hospital / Doctor's office",
+				"PeopleWithAnswer": 7
+			},
+			{
+				"Answer": "Courtroom",
+				"PeopleWithAnswer": 4
+			}
+		]
+	},
+	{
+		"PointsPerAnswer": 10,
+		"Question": "Name something people often lose.",
+		"Answers": [
+			{
+				"Answer": "Keys",
+				"PeopleWithAnswer": 45
+			},
+			{
+				"Answer": "Phone",
+				"PeopleWithAnswer": 26
+			},
+			{
+				"Answer": "Wallet / Purse",
+				"PeopleWithAnswer": 14
+			},
+			{
+				"Answer": "Socks",
+				"PeopleWithAnswer": 9
+			},
+			{
+				"Answer": "Glasses / Sunglasses",
+				"PeopleWithAnswer": 6
+			}
+		]
+	},
+	{
+		"PointsPerAnswer": 10,
+		"Question": "Name a reason why someone might stay up all night.",
+		"Answers": [
+			{
+				"Answer": "Studying / Work",
+				"PeopleWithAnswer": 38
+			},
+			{
+				"Answer": "Partying / Socializing",
+				"PeopleWithAnswer": 27
+			},
+			{
+				"Answer": "Insomnia / Can't sleep",
+				"PeopleWithAnswer": 18
+			},
+			{
+				"Answer": "Binge-watching TV / Gaming",
+				"PeopleWithAnswer": 12
+			},
+			{
+				"Answer": "Sick child / Baby",
+				"PeopleWithAnswer": 5
+			}
+		]
+	},
+	{
+		"PointsPerAnswer": 10,
+		"Question": "Name a food that tastes great even when served cold.",
+		"Answers": [
+			{
+				"Answer": "Pizza",
+				"PeopleWithAnswer": 58
+			},
+			{
+				"Answer": "Ice cream",
+				"PeopleWithAnswer": 20
+			},
+			{
+				"Answer": "Fried chicken",
+				"PeopleWithAnswer": 11
+			},
+			{
+				"Answer": "Chocolate",
+				"PeopleWithAnswer": 7
+			},
+			{
+				"Answer": "Sub sandwich",
+				"PeopleWithAnswer": 4
+			}
+		]
+	}
+]

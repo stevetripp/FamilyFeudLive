@@ -1,3 +1,4 @@
+using System.Text.Json;
 using FamilyFeudLive.Models;
 
 namespace FamilyFeudLive.Services;
@@ -125,6 +126,81 @@ public class GameStateService
                 }
             }
         };
+    }
+
+    public int ImportQuestionsFromJson(string json, bool replaceExisting = false)
+    {
+        lock (_lock)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var imported = JsonSerializer.Deserialize<List<JsonImportQuestion>>(json, options);
+            if (imported == null || imported.Count == 0)
+            {
+                return 0;
+            }
+
+            if (replaceExisting)
+            {
+                Questions.Clear();
+                CurrentRoundIndex = 0;
+                Strikes = 0;
+                ResetBuzzer();
+            }
+
+            int startId = Questions.Count > 0 ? Questions.Max(q => q.Id) + 1 : 1;
+            int addedCount = 0;
+
+            foreach (var item in imported)
+            {
+                var qText = !string.IsNullOrWhiteSpace(item.Question) ? item.Question : item.Text;
+                if (string.IsNullOrWhiteSpace(qText)) continue;
+
+                // Multiplier: user specified, or progressive Feud ladder (1x for first 2 rounds, 2x for next 2, 3x for 5+)
+                int totalRoundsBefore = Questions.Count;
+                int defaultMultiplier = totalRoundsBefore < 2 ? 1 : (totalRoundsBefore < 4 ? 2 : 3);
+                int multiplier = item.Multiplier > 0 && item.Multiplier != 1 ? item.Multiplier : defaultMultiplier;
+
+                var question = new Question
+                {
+                    Id = startId++,
+                    Text = qText.Trim(),
+                    Multiplier = multiplier,
+                    Answers = new List<AnswerItem>()
+                };
+
+                if (item.Answers != null)
+                {
+                    int answerId = 1;
+                    foreach (var a in item.Answers)
+                    {
+                        var aText = !string.IsNullOrWhiteSpace(a.Answer) ? a.Answer : a.Text;
+                        if (string.IsNullOrWhiteSpace(aText)) continue;
+
+                        int points = a.PeopleWithAnswer > 0
+                            ? a.PeopleWithAnswer
+                            : (a.Points > 0 ? a.Points : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10));
+
+                        question.Answers.Add(new AnswerItem
+                        {
+                            Id = answerId++,
+                            Text = aText.Trim(),
+                            Points = points,
+                            IsRevealed = false
+                        });
+                    }
+                }
+
+                Questions.Add(question);
+                addedCount++;
+            }
+
+            NotifyStateChanged();
+            return addedCount;
+        }
     }
 
     public bool PressBuzzer(string teamName, string playerName)

@@ -220,9 +220,65 @@
                 </div>
             </div>
 
+            <!-- JSON Questions Import -->
+            <div class="host-card mt-3 border-secondary">
+                <h5 class="fw-bold text-warning mb-2">📥 Import Questions Pack (JSON)</h5>
+                <p class="text-secondary small mb-3">
+                    Import question sets formatted with <code>Question</code>, <code>Answers</code>, and <code>PeopleWithAnswer</code> (matching <code>TextFile.json</code>).
+                </p>
+
+                @if (!string.IsNullOrEmpty(_importSuccessMessage))
+                {
+                    <div class="alert alert-success alert-dismissible fade show py-2 small mb-3">
+                        @_importSuccessMessage
+                        <button type="button" class="btn-close btn-close-white" @onclick="() => _importSuccessMessage = null"></button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(_importErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show py-2 small mb-3">
+                        @_importErrorMessage
+                        <button type="button" class="btn-close btn-close-white" @onclick="() => _importErrorMessage = null"></button>
+                    </div>
+                }
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="replaceToggle" @bind="_replaceExistingOnImport" />
+                    <label class="form-check-label text-light small fw-bold" for="replaceToggle">
+                        Replace existing questions (unchecked = append as new rounds)
+                    </label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-secondary small fw-bold mb-1">Upload .JSON File:</label>
+                    <InputFile OnChange="HandleFileUpload" accept=".json" class="form-control form-control-sm bg-dark text-white border-secondary" />
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-warning fw-bold" @onclick="LoadSampleTextFile">
+                        📄 Load "TextFile.json" Pack
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" @onclick="() => _showPasteJson = !_showPasteJson">
+                        @(_showPasteJson ? "Hide Paste Area" : "📋 Paste Raw JSON")
+                    </button>
+                </div>
+
+                @if (_showPasteJson)
+                {
+                    <div class="mt-3">
+                        <textarea class="form-control bg-dark text-white border-secondary font-monospace small mb-2"
+                                  rows="6" placeholder="Paste JSON array here..." @bind="_pastedJsonText"></textarea>
+                        <button class="btn btn-sm btn-success fw-bold" @onclick="ImportPastedJson">
+                            Import Pasted JSON
+                        </button>
+                    </div>
+                }
+            </div>
+
             <!-- Custom Question Creator -->
             <div class="host-card mt-3">
-                <h5 class="fw-bold text-light mb-2">➕ Add Custom Question</h5>
+                <h5 class="fw-bold text-light mb-2">➕ Add Single Custom Question</h5>
                 <div class="input-group mb-2">
                     <input type="text" class="form-control bg-dark text-white border-secondary"
                            placeholder="Type a custom survey question..." @bind="_customQuestionText" />
@@ -250,6 +306,12 @@
     private int _customMultiplier = 1;
     private string _customAnswersRaw = string.Empty;
 
+    private bool _replaceExistingOnImport = false;
+    private bool _showPasteJson = false;
+    private string _pastedJsonText = string.Empty;
+    private string? _importSuccessMessage;
+    private string? _importErrorMessage;
+
     protected override void OnInitialized()
     {
         GameState.OnChange += HandleStateChanged;
@@ -263,6 +325,105 @@
     private void ConfirmResetGame()
     {
         GameState.ResetGame();
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        _importSuccessMessage = null;
+        _importErrorMessage = null;
+
+        try
+        {
+            var file = e.File;
+            if (file == null) return;
+
+            using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            var json = await reader.ReadToEndAsync();
+
+            int count = GameState.ImportQuestionsFromJson(json, _replaceExistingOnImport);
+            if (count > 0)
+            {
+                _importSuccessMessage = $"Successfully imported {count} rounds from '{file.Name}'!";
+            }
+            else
+            {
+                _importErrorMessage = "No valid questions were found in the uploaded file.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _importErrorMessage = $"Error importing JSON: {ex.Message}";
+        }
+    }
+
+    private void LoadSampleTextFile()
+    {
+        _importSuccessMessage = null;
+        _importErrorMessage = null;
+
+        try
+        {
+            var searchPaths = new[]
+            {
+                Path.Combine(AppContext.BaseDirectory, "TextFile.json"),
+                Path.Combine(Directory.GetCurrentDirectory(), "TextFile.json"),
+                @"D:\Src\FamilyFeudLive\TextFile.json"
+            };
+
+            var path = searchPaths.FirstOrDefault(File.Exists);
+            if (path == null)
+            {
+                _importErrorMessage = "Could not find 'TextFile.json' on the server.";
+                return;
+            }
+
+            var json = File.ReadAllText(path);
+            int count = GameState.ImportQuestionsFromJson(json, _replaceExistingOnImport);
+            if (count > 0)
+            {
+                _importSuccessMessage = $"Successfully imported {count} rounds from TextFile.json!";
+            }
+            else
+            {
+                _importErrorMessage = "No valid questions were found in TextFile.json.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _importErrorMessage = $"Error loading TextFile.json: {ex.Message}";
+        }
+    }
+
+    private void ImportPastedJson()
+    {
+        _importSuccessMessage = null;
+        _importErrorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(_pastedJsonText))
+        {
+            _importErrorMessage = "Please paste JSON before clicking import.";
+            return;
+        }
+
+        try
+        {
+            int count = GameState.ImportQuestionsFromJson(_pastedJsonText, _replaceExistingOnImport);
+            if (count > 0)
+            {
+                _importSuccessMessage = $"Successfully imported {count} rounds from pasted JSON!";
+                _pastedJsonText = string.Empty;
+                _showPasteJson = false;
+            }
+            else
+            {
+                _importErrorMessage = "No valid questions found in the pasted JSON.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _importErrorMessage = $"Error parsing JSON: {ex.Message}";
+        }
     }
 
     private void AddCustomQuestion()

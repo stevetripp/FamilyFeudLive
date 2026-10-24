@@ -31,3 +31,20 @@ public class BuzzerState
     public string? WinnerPlayer { get; set; }
     public DateTime? WinnerTimestamp { get; set; }
 }
+
+public class JsonImportAnswer
+{
+    public string? Answer { get; set; }
+    public string? Text { get; set; }
+    public int PeopleWithAnswer { get; set; }
+    public int Points { get; set; }
+}
+
+public class JsonImportQuestion
+{
+    public string? Question { get; set; }
+    public string? Text { get; set; }
+    public int PointsPerAnswer { get; set; } = 10;
+    public int Multiplier { get; set; } = 1;
+    public List<JsonImportAnswer>? Answers { get; set; }
+}
