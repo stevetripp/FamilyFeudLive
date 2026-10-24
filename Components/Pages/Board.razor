@@ -1,17 +1,41 @@
 @page "/board"
 @layout GameLayout
 @inject GameStateService GameState
+@inject QrCodeService QrService
+@inject NavigationManager Nav
 @inject IJSRuntime JS
 @implements IDisposable
 
 <div class="board-container">
     <!-- Top Scoreboard Bar -->
     <div class="scoreboard-header">
+        <!-- Team 1 Box -->
         <div class="team-box" style="color: @GameState.Team1.Color;">
             <div class="team-name">@GameState.Team1.Name</div>
             <div class="team-score">@GameState.Team1.Score</div>
         </div>
 
+        <!-- Team 1 Buzzer QR Code (Between Team 1 Points and Round Bank) -->
+        <div class="team-qr-container">
+            <a href="@_team1BuzzerUrl" target="_blank" class="team-qr-link" title="Join @GameState.Team1.Name (@_team1BuzzerUrl)">
+                <div class="team-qr-card" style="--team-glow: @GameState.Team1.Color; border-color: @GameState.Team1.Color;">
+                    <div class="team-qr-badge" style="background-color: @GameState.Team1.Color;">
+                        📱 BUZZ IN
+                    </div>
+                    <div class="team-qr-graphic">
+                        @if (!string.IsNullOrEmpty(_team1QrSvg))
+                        {
+                            @((MarkupString)_team1QrSvg)
+                        }
+                    </div>
+                    <div class="team-qr-teamname" style="color: @GameState.Team1.Color;">
+                        @GameState.Team1.Name
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Round Bank Box -->
         <div class="bank-box">
             <div class="bank-label">ROUND BANK</div>
             <div class="bank-score">@GameState.RoundBank</div>
@@ -20,6 +44,27 @@
             </div>
         </div>
 
+        <!-- Team 2 Buzzer QR Code (Between Round Bank and Team 2 Points) -->
+        <div class="team-qr-container">
+            <a href="@_team2BuzzerUrl" target="_blank" class="team-qr-link" title="Join @GameState.Team2.Name (@_team2BuzzerUrl)">
+                <div class="team-qr-card" style="--team-glow: @GameState.Team2.Color; border-color: @GameState.Team2.Color;">
+                    <div class="team-qr-badge" style="background-color: @GameState.Team2.Color;">
+                        📱 BUZZ IN
+                    </div>
+                    <div class="team-qr-graphic">
+                        @if (!string.IsNullOrEmpty(_team2QrSvg))
+                        {
+                            @((MarkupString)_team2QrSvg)
+                        }
+                    </div>
+                    <div class="team-qr-teamname" style="color: @GameState.Team2.Color;">
+                        @GameState.Team2.Name
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Team 2 Box -->
         <div class="team-box" style="color: @GameState.Team2.Color;">
             <div class="team-name">@GameState.Team2.Name</div>
             <div class="team-score">@GameState.Team2.Score</div>
@@ -34,7 +79,8 @@
     <!-- Live Buzzer Winner Alert -->
     @if (GameState.Buzzer.WinnerTeam != null)
     {
-        <div class="buzzer-alert-banner">
+        var winnerColor = GameState.GetTeamColor(GameState.Buzzer.WinnerTeam);
+        <div class="buzzer-alert-banner" style="--banner-color: @winnerColor;">
             🔔 @GameState.Buzzer.WinnerTeam.ToUpper()
             @if (!string.IsNullOrWhiteSpace(GameState.Buzzer.WinnerPlayer))
             {
@@ -87,7 +133,7 @@
 
     <!-- Footer join hint -->
     <div class="text-center mt-4 text-light opacity-50 small">
-        To buzz in, join with your phone at: <strong class="text-warning">/buzzer</strong>
+        To buzz in, scan your team's QR code above or join at: <strong class="text-warning">@(QrService.BuildBuzzerUrl(Nav.Uri))</strong>
     </div>
 </div>
 
@@ -110,12 +156,34 @@
     private long _lastStrikeHandled;
     private bool _showStrikeOverlay = false;
 
+    private string _team1BuzzerUrl = string.Empty;
+    private string _team2BuzzerUrl = string.Empty;
+    private string _team1QrSvg = string.Empty;
+    private string _team2QrSvg = string.Empty;
+
     protected override void OnInitialized()
     {
         GameState.OnChange += HandleStateChanged;
         _lastBuzzerHandled = GameState.LastBuzzerEventId;
         _lastDingHandled = GameState.LastDingEventId;
         _lastStrikeHandled = GameState.LastStrikeEventId;
+
+        InitTeamQrCodes();
+    }
+
+    private void InitTeamQrCodes()
+    {
+        try
+        {
+            _team1BuzzerUrl = QrService.BuildBuzzerUrl(Nav.Uri, "1");
+            _team2BuzzerUrl = QrService.BuildBuzzerUrl(Nav.Uri, "2");
+            _team1QrSvg = QrService.GenerateSvgQrCode(_team1BuzzerUrl);
+            _team2QrSvg = QrService.GenerateSvgQrCode(_team2BuzzerUrl);
+        }
+        catch
+        {
+            // fallback if QR generation has any issue
+        }
     }
 
     private async void HandleStateChanged()

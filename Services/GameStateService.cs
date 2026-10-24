@@ -39,6 +39,27 @@ public class GameStateService
         }
     }
 
+    public string GetTeamColor(string? teamName)
+    {
+        if (string.IsNullOrWhiteSpace(teamName)) return Team1.Color;
+
+        if (string.Equals(teamName, Team1.Name, StringComparison.OrdinalIgnoreCase) ||
+            teamName == "1" || string.Equals(teamName, "team1", StringComparison.OrdinalIgnoreCase) ||
+            teamName.Contains("red", StringComparison.OrdinalIgnoreCase))
+        {
+            return Team1.Color;
+        }
+
+        if (string.Equals(teamName, Team2.Name, StringComparison.OrdinalIgnoreCase) ||
+            teamName == "2" || string.Equals(teamName, "team2", StringComparison.OrdinalIgnoreCase) ||
+            teamName.Contains("blue", StringComparison.OrdinalIgnoreCase))
+        {
+            return Team2.Color;
+        }
+
+        return Team1.Color;
+    }
+
     public GameStateService()
     {
         LoadDefaultQuestions();

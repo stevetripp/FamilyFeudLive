@@ -1,4 +1,5 @@
 @page "/buzzer"
+@page "/buzzer/{TeamRoute}"
 @layout GameLayout
 @inject GameStateService GameState
 @inject IJSRuntime JS
@@ -18,14 +19,14 @@
             <div class="mb-3">
                 <label class="form-label text-light fw-bold">Select Team:</label>
                 <div class="d-grid gap-2">
-                    <button class="btn btn-lg fw-bold text-white py-3"
+                    <button class="btn btn-lg fw-bold text-white py-3 shadow"
                             style="background-color: @GameState.Team1.Color; border: 2px solid #fff;"
-                            @onclick="() => SelectTeam(GameState.Team1.Name)">
+                            @onclick="() => SelectTeam(1)">
                         🔴 @GameState.Team1.Name
                     </button>
-                    <button class="btn btn-lg fw-bold text-white py-3"
+                    <button class="btn btn-lg fw-bold text-white py-3 shadow"
                             style="background-color: @GameState.Team2.Color; border: 2px solid #fff;"
-                            @onclick="() => SelectTeam(GameState.Team2.Name)">
+                            @onclick="() => SelectTeam(2)">
                         🔵 @GameState.Team2.Name
                     </button>
                 </div>
@@ -41,20 +42,39 @@
     else
     {
         <!-- Step 2: The Giant Buzzer -->
-        <div class="w-100 d-flex justify-content-between align-items-center mb-3 px-2">
+        <div class="w-100 d-flex justify-content-between align-items-center mb-3 px-2" style="max-width: 450px;">
             <div>
-                <span class="badge bg-secondary p-2 fs-6">
-                    Team: <strong class="text-warning">@_selectedTeam</strong>
+                <span class="badge p-2 fs-6 border border-light" style="background-color: @GetTeamColor();">
+                    Team: <strong>@_selectedTeam</strong>
                     @if (!string.IsNullOrWhiteSpace(_playerName))
                     {
                         <span>(@_playerName)</span>
                     }
                 </span>
             </div>
-            <button class="btn btn-sm btn-outline-light opacity-75" @onclick="SwitchTeam">
-                Change Team
-            </button>
+            <div class="d-flex gap-2">
+                @if (string.IsNullOrWhiteSpace(_playerName) && !_showNameInput)
+                {
+                    <button class="btn btn-sm btn-outline-warning" @onclick="() => _showNameInput = true">
+                        ✏️ Name
+                    </button>
+                }
+                <button class="btn btn-sm btn-outline-light opacity-75" @onclick="SwitchTeam">
+                    Change Team
+                </button>
+            </div>
         </div>
+
+        @if (_showNameInput)
+        {
+            <div class="w-100 mb-3 px-2" style="max-width: 450px;">
+                <div class="input-group">
+                    <input type="text" class="form-control bg-dark text-white border-warning"
+                           placeholder="Your name (e.g. Alice)" @bind="_playerName" />
+                    <button class="btn btn-warning fw-bold" @onclick="() => _showNameInput = false">Done</button>
+                </div>
+            </div>
+        }
 
         <div class="buzzer-btn-wrapper my-auto text-center">
             @{
@@ -126,22 +146,74 @@
 </div>
 
 @code {
+    [SupplyParameterFromQuery(Name = "team")]
+    public string? TeamQuery { get; set; }
+
+    [Parameter]
+    public string? TeamRoute { get; set; }
+
     private string? _selectedTeam;
+    private int? _selectedTeamIndex;
     private string _playerName = string.Empty;
+    private bool _userClearedTeam = false;
+    private bool _showNameInput = false;
 
     protected override void OnInitialized()
     {
         GameState.OnChange += HandleStateChanged;
+        ApplyTeamSelection();
     }
 
-    private void SelectTeam(string team)
+    protected override void OnParametersSet()
     {
-        _selectedTeam = team;
+        ApplyTeamSelection();
+    }
+
+    private void ApplyTeamSelection()
+    {
+        if (_userClearedTeam || !string.IsNullOrEmpty(_selectedTeam)) return;
+
+        var teamParam = !string.IsNullOrWhiteSpace(TeamQuery) ? TeamQuery : TeamRoute;
+        if (string.IsNullOrWhiteSpace(teamParam)) return;
+
+        teamParam = teamParam.Trim();
+        if (teamParam == "1" || string.Equals(teamParam, "team1", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(teamParam, "red", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(teamParam, GameState.Team1.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            _selectedTeamIndex = 1;
+            _selectedTeam = GameState.Team1.Name;
+        }
+        else if (teamParam == "2" || string.Equals(teamParam, "team2", StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(teamParam, "blue", StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(teamParam, GameState.Team2.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            _selectedTeamIndex = 2;
+            _selectedTeam = GameState.Team2.Name;
+        }
+        else
+        {
+            _selectedTeam = teamParam;
+        }
+    }
+
+    private void SelectTeam(int teamIndex)
+    {
+        _userClearedTeam = false;
+        _selectedTeamIndex = teamIndex;
+        _selectedTeam = teamIndex == 1 ? GameState.Team1.Name : GameState.Team2.Name;
     }
 
     private void SwitchTeam()
     {
         _selectedTeam = null;
+        _selectedTeamIndex = null;
+        _userClearedTeam = true;
+    }
+
+    private string GetTeamColor()
+    {
+        return GameState.GetTeamColor(_selectedTeam);
     }
 
     private async Task OnBuzzerPress()
@@ -158,6 +230,15 @@
 
     private async void HandleStateChanged()
     {
+        if (_selectedTeamIndex == 1)
+        {
+            _selectedTeam = GameState.Team1.Name;
+        }
+        else if (_selectedTeamIndex == 2)
+        {
+            _selectedTeam = GameState.Team2.Name;
+        }
+
         await InvokeAsync(StateHasChanged);
     }
 

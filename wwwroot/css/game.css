@@ -95,6 +95,107 @@ body.game-body {
     margin-top: 4px;
 }
 
+/* Board Header Team QR Codes */
+.team-qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    flex-shrink: 0;
+}
+
+.team-qr-link {
+    text-decoration: none;
+    cursor: pointer;
+    display: block;
+}
+
+.team-qr-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 16px var(--team-glow, rgba(255, 255, 255, 0.4)), 0 4px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 106px;
+}
+
+.team-qr-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 24px var(--team-glow, rgba(255, 255, 255, 0.8));
+}
+
+.team-qr-badge {
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 2px 4px;
+    border-radius: 5px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+.team-qr-graphic {
+    width: 88px;
+    height: 88px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-qr-graphic svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+.team-qr-teamname {
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-align: center;
+    margin-top: 3px;
+    text-transform: uppercase;
+    max-width: 96px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 992px) {
+    .scoreboard-header {
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+    }
+    .bank-box {
+        order: -1;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .team-box {
+        min-width: 150px;
+    }
+    .team-qr-card {
+        width: 92px;
+    }
+    .team-qr-graphic {
+        width: 76px;
+        height: 76px;
+    }
+}
+
 /* QUESTION BAR */
 .question-bar {
     background: linear-gradient(90deg, #091a38 0%, #15346b 50%, #091a38 100%);
@@ -277,23 +378,24 @@ body.game-body {
 
 /* BUZZER ALERT BANNER */
 .buzzer-alert-banner {
-    background: linear-gradient(90deg, #ff002b 0%, #ff8500 50%, #ff002b 100%);
-    background-size: 200% 200%;
-    animation: gradientShift 1s infinite alternate;
+    background-color: var(--banner-color, #ff002b);
     color: #fff;
-    font-size: 2rem;
+    font-size: 2.1rem;
     font-weight: 900;
     text-align: center;
-    padding: 15px 20px;
-    border-radius: 12px;
+    padding: 16px 24px;
+    border-radius: 14px;
     margin-top: 20px;
-    box-shadow: 0 0 35px rgba(255, 0, 43, 0.8);
-    text-shadow: 2px 2px 4px #000;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 35px var(--banner-color, rgba(255, 0, 43, 0.8)), 0 4px 15px rgba(0, 0, 0, 0.6);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9);
+    letter-spacing: 1px;
+    animation: buzzerAlertPulse 0.9s infinite alternate ease-in-out;
 }
 
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
+@keyframes buzzerAlertPulse {
+    0% { transform: scale(1); filter: brightness(1); }
+    100% { transform: scale(1.02); filter: brightness(1.2); }
 }
 
 /* MOBILE BUZZER SCREEN */
