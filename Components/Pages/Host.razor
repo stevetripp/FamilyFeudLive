@@ -19,24 +19,20 @@
     <!-- Mode Switcher Tabs -->
     <ul class="nav nav-pills mb-4 gap-2">
         <li class="nav-item">
-            <button class="nav-link @(!_isFastMoneyTab ? "active bg-info text-dark fw-bold" : "text-light bg-dark border border-secondary")"
-                    @onclick="() => _isFastMoneyTab = false">
+            <button class="nav-link @(!GameState.FastMoney.IsActive ? "active bg-info text-dark fw-bold" : "text-light bg-dark border border-secondary")"
+                    @onclick="() => GameState.SetFastMoneyActive(false)">
                 🎯 Main Game Rounds
             </button>
         </li>
         <li class="nav-item">
-            <button class="nav-link @(_isFastMoneyTab ? "active bg-warning text-dark fw-bold" : "text-warning bg-dark border border-warning")"
-                    @onclick="() => _isFastMoneyTab = true">
+            <button class="nav-link @(GameState.FastMoney.IsActive ? "active bg-warning text-dark fw-bold" : "text-warning bg-dark border border-warning")"
+                    @onclick="() => GameState.SetFastMoneyActive(true)">
                 ⚡ Fast Money Round
-                @if (GameState.FastMoney.IsActive)
-                {
-                    <span class="badge bg-danger ms-2">LIVE ON TV</span>
-                }
             </button>
         </li>
     </ul>
 
-    @if (!_isFastMoneyTab)
+    @if (!GameState.FastMoney.IsActive)
     {
         <!-- ==================== MAIN GAME CONTROLS ==================== -->
         <div class="row g-4">
@@ -331,46 +327,12 @@
     {
         <!-- ==================== FAST MONEY HOST DESK ==================== -->
         <div class="row g-4">
-            <!-- TOP BAR: Board Display Mode & Team Selector -->
+            <!-- TOP BAR: Winning Team Selector -->
             <div class="col-12">
                 <div class="fm-host-card border-warning">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <span class="text-secondary small fw-bold d-block">TV AUDIENCE BOARD STATUS:</span>
-                            @if (GameState.FastMoney.IsActive)
-                            {
-                                <span class="badge bg-success fs-6">🟢 LIVE: Fast Money Board is showing on TV</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary fs-6">⚪ OFF: Main Game Board is showing on TV</span>
-                            }
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            @if (!GameState.FastMoney.IsActive)
-                            {
-                                <button class="btn btn-warning fw-bold" @onclick="() => GameState.SetFastMoneyActive(true)">
-                                    📺 Put Fast Money on TV Board
-                                </button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-outline-light fw-bold" @onclick="() => GameState.SetFastMoneyActive(false)">
-                                    ◀ Return TV Board to Main Game
-                                </button>
-                            }
-                        </div>
-                    </div>
-
-                    <hr class="border-secondary my-3" />
-
-                    <!-- Winning Team Selection -->
-                    <div class="row align-items-center g-2">
-                        <div class="col-md-3">
-                            <span class="fw-bold text-warning">WINNING TEAM:</span>
-                        </div>
-                        <div class="col-md-9 d-flex gap-3">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold text-warning fs-5">🏆 WINNING TEAM:</span>
                             <button class="btn @(GameState.FastMoney.WinningTeamNumber == 1 ? "btn-danger fw-bold" : "btn-outline-danger")"
                                     @onclick="() => GameState.SetFastMoneyWinningTeam(1)">
                                 Team 1: @GameState.Team1.Name
@@ -379,6 +341,9 @@
                                     @onclick="() => GameState.SetFastMoneyWinningTeam(2)">
                                 Team 2: @GameState.Team2.Name
                             </button>
+                        </div>
+                        <div>
+                            <span class="badge bg-success fs-6">🟢 LIVE ON TV BOARD</span>
                         </div>
                     </div>
                 </div>
@@ -614,7 +579,6 @@
 </div>
 
 @code {
-    private bool _isFastMoneyTab = false;
     private string _customQuestionText = string.Empty;
     private int _customMultiplier = 1;
     private string _customAnswersRaw = string.Empty;
