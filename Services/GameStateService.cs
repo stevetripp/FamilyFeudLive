@@ -629,6 +629,10 @@ public class GameStateService
                 {
                     LoadDefaultFastMoneyQuestions();
                 }
+                foreach (var q in FastMoney.Questions)
+                {
+                    q.IsRevealed = false;
+                }
             }
             NotifyStateChanged();
         }
@@ -652,6 +656,13 @@ public class GameStateService
             StopFastMoneyTimer();
             FastMoney.TimeRemaining = playerNumber == 1 ? 20 : 25;
             FastMoney.DuplicateWarningMessage = null;
+
+            // Hide questions when switching between player 1 and 2
+            foreach (var q in FastMoney.Questions)
+            {
+                q.IsRevealed = false;
+            }
+
             NotifyStateChanged();
         }
     }
@@ -869,6 +880,48 @@ public class GameStateService
         }
     }
 
+    public void ToggleFastMoneyQuestionReveal(int questionIndex)
+    {
+        lock (_lock)
+        {
+            if (questionIndex >= 0 && questionIndex < FastMoney.Questions.Count)
+            {
+                var q = FastMoney.Questions[questionIndex];
+                q.IsRevealed = !q.IsRevealed;
+                if (q.IsRevealed)
+                {
+                    LastDingEventId = DateTime.UtcNow.Ticks;
+                }
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public void RevealAllFastMoneyQuestions()
+    {
+        lock (_lock)
+        {
+            foreach (var q in FastMoney.Questions)
+            {
+                q.IsRevealed = true;
+            }
+            LastDingEventId = DateTime.UtcNow.Ticks;
+            NotifyStateChanged();
+        }
+    }
+
+    public void HideAllFastMoneyQuestions()
+    {
+        lock (_lock)
+        {
+            foreach (var q in FastMoney.Questions)
+            {
+                q.IsRevealed = false;
+            }
+            NotifyStateChanged();
+        }
+    }
+
     public void ResetFastMoneyRound()
     {
         lock (_lock)
@@ -877,6 +930,10 @@ public class GameStateService
             FastMoney.CurrentPlayer = 1;
             FastMoney.TimeRemaining = 20;
             FastMoney.DuplicateWarningMessage = null;
+            foreach (var q in FastMoney.Questions)
+            {
+                q.IsRevealed = false;
+            }
             InitFastMoneyPlayerSlots();
             NotifyStateChanged();
         }

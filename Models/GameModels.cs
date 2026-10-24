@@ -69,6 +69,7 @@ public class FastMoneyQuestion
     public int QuestionId { get; set; }
     public string Question { get; set; } = string.Empty;
     public string? Text { get; set; }
+    public bool IsRevealed { get; set; }
     public List<FastMoneyAnswer> Answers { get; set; } = new();
 }
 

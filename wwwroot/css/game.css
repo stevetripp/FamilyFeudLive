@@ -846,6 +846,24 @@ body.game-body {
     justify-content: center;
     text-align: center;
     padding: 4px;
+    min-height: 58px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.fm-slot-center.hidden {
+    opacity: 0.55;
+}
+
+.fm-slot-center.revealed {
+    opacity: 1;
+}
+
+.fm-q-hidden {
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    color: #4a5d80;
+    font-weight: 900;
 }
 
 .fm-q-badge {
@@ -866,6 +884,12 @@ body.game-body {
     overflow: hidden;
     line-height: 1.1;
     text-overflow: ellipsis;
+    animation: fadeInText 0.35s ease;
+}
+
+@keyframes fadeInText {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .fm-win-celebration {

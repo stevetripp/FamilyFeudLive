@@ -211,9 +211,16 @@ else
                     </div>
 
                     <!-- Question Number & Prompt Indicator -->
-                    <div class="fm-slot-center" title="@question.Question">
+                    <div class="fm-slot-center @(question.IsRevealed ? "revealed" : "hidden")" title="@(question.IsRevealed ? question.Question : $"Question #{i + 1}")">
                         <span class="fm-q-badge">#@(i + 1)</span>
-                        <span class="fm-q-text">@question.Question</span>
+                        @if (question.IsRevealed)
+                        {
+                            <span class="fm-q-text">@question.Question</span>
+                        }
+                        else
+                        {
+                            <span class="fm-q-hidden">••••••••</span>
+                        }
                     </div>
 
                     <!-- Player 2 Answer & Points -->
