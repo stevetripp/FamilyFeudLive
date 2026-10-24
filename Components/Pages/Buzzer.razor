@@ -1,0 +1,168 @@
+@page "/buzzer"
+@layout GameLayout
+@inject GameStateService GameState
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="buzzer-page">
+    @if (string.IsNullOrEmpty(_selectedTeam))
+    {
+        <!-- Step 1: Select Team & Name -->
+        <div class="card bg-dark text-white border-warning p-4 shadow-lg my-auto" style="max-width: 420px; width: 100%;">
+            <div class="text-center mb-4">
+                <div class="display-3 mb-2">🚨</div>
+                <h2 class="fw-bold text-warning">Contestant Buzzer</h2>
+                <p class="text-light opacity-75">Pick your family/team to join the face-off</p>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-light fw-bold">Select Team:</label>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-lg fw-bold text-white py-3"
+                            style="background-color: @GameState.Team1.Color; border: 2px solid #fff;"
+                            @onclick="() => SelectTeam(GameState.Team1.Name)">
+                        🔴 @GameState.Team1.Name
+                    </button>
+                    <button class="btn btn-lg fw-bold text-white py-3"
+                            style="background-color: @GameState.Team2.Color; border: 2px solid #fff;"
+                            @onclick="() => SelectTeam(GameState.Team2.Name)">
+                        🔵 @GameState.Team2.Name
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3 mt-2">
+                <label class="form-label text-light fw-bold">Your Name (optional):</label>
+                <input type="text" class="form-control form-control-lg bg-secondary text-white border-0"
+                       placeholder="e.g. Alice" @bind="_playerName" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Step 2: The Giant Buzzer -->
+        <div class="w-100 d-flex justify-content-between align-items-center mb-3 px-2">
+            <div>
+                <span class="badge bg-secondary p-2 fs-6">
+                    Team: <strong class="text-warning">@_selectedTeam</strong>
+                    @if (!string.IsNullOrWhiteSpace(_playerName))
+                    {
+                        <span>(@_playerName)</span>
+                    }
+                </span>
+            </div>
+            <button class="btn btn-sm btn-outline-light opacity-75" @onclick="SwitchTeam">
+                Change Team
+            </button>
+        </div>
+
+        <div class="buzzer-btn-wrapper my-auto text-center">
+            @{
+                bool isReady = GameState.Buzzer.IsActive && !GameState.Buzzer.IsLocked;
+                bool isWinner = GameState.Buzzer.IsLocked && GameState.Buzzer.WinnerTeam == _selectedTeam;
+                bool isLockedOut = GameState.Buzzer.IsLocked && !isWinner;
+            }
+
+            <button class="big-buzzer @(isReady ? "pulsing" : "") @(isWinner ? "winner" : "")"
+                    disabled="@(!isReady)"
+                    @onclick="OnBuzzerPress">
+                @if (isWinner)
+                {
+                    <span>🏆 FIRST!</span>
+                }
+                else if (isLockedOut)
+                {
+                    <span style="font-size: 1.6rem;">LOCKED</span>
+                }
+                else if (isReady)
+                {
+                    <span>BUZZ!</span>
+                }
+                else
+                {
+                    <span style="font-size: 1.3rem;">WAIT</span>
+                }
+            </button>
+
+            <!-- Status description below button -->
+            <div class="mt-4">
+                @if (isWinner)
+                {
+                    <div class="alert alert-success fw-bold fs-5 shadow">
+                        🎉 YOU BUZZED IN FIRST!
+                    </div>
+                }
+                else if (isLockedOut)
+                {
+                    <div class="alert alert-danger fw-bold fs-6 shadow">
+                        ⛔ LOCKED OUT! <br />
+                        <strong>@GameState.Buzzer.WinnerTeam</strong>
+                        @if (!string.IsNullOrWhiteSpace(GameState.Buzzer.WinnerPlayer))
+                        {
+                            <span>(@GameState.Buzzer.WinnerPlayer)</span>
+                        }
+                        was faster!
+                    </div>
+                }
+                else if (isReady)
+                {
+                    <div class="text-warning fw-bold fs-4 animate__animated animate__pulse animate__infinite">
+                        ⚡ BUZZ IN NOW! ⚡
+                    </div>
+                }
+                else
+                {
+                    <div class="text-light opacity-50 fw-semibold">
+                        Waiting for host to activate the face-off...
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="text-center text-light opacity-50 small mt-auto py-2">
+            Family Feud Buzzer • Keep this screen open
+        </div>
+    }
+</div>
+
+@code {
+    private string? _selectedTeam;
+    private string _playerName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        GameState.OnChange += HandleStateChanged;
+    }
+
+    private void SelectTeam(string team)
+    {
+        _selectedTeam = team;
+    }
+
+    private void SwitchTeam()
+    {
+        _selectedTeam = null;
+    }
+
+    private async Task OnBuzzerPress()
+    {
+        if (string.IsNullOrEmpty(_selectedTeam)) return;
+
+        bool success = GameState.PressBuzzer(_selectedTeam, _playerName);
+        if (success)
+        {
+            await JS.InvokeVoidAsync("feudAudio.playBuzzer");
+            await JS.InvokeVoidAsync("feudAudio.vibrate");
+        }
+    }
+
+    private async void HandleStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        GameState.OnChange -= HandleStateChanged;
+    }
+}

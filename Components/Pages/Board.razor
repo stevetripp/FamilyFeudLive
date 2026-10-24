@@ -1,0 +1,159 @@
+@page "/board"
+@layout GameLayout
+@inject GameStateService GameState
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="board-container">
+    <!-- Top Scoreboard Bar -->
+    <div class="scoreboard-header">
+        <div class="team-box" style="color: @GameState.Team1.Color;">
+            <div class="team-name">@GameState.Team1.Name</div>
+            <div class="team-score">@GameState.Team1.Score</div>
+        </div>
+
+        <div class="bank-box">
+            <div class="bank-label">ROUND BANK</div>
+            <div class="bank-score">@GameState.RoundBank</div>
+            <div class="round-badge">
+                ROUND @(GameState.CurrentRoundIndex + 1) • @(GameState.CurrentQuestion.Multiplier)X POINTS
+            </div>
+        </div>
+
+        <div class="team-box" style="color: @GameState.Team2.Color;">
+            <div class="team-name">@GameState.Team2.Name</div>
+            <div class="team-score">@GameState.Team2.Score</div>
+        </div>
+    </div>
+
+    <!-- Question Display -->
+    <div class="question-bar">
+        @GameState.CurrentQuestion.Text
+    </div>
+
+    <!-- Live Buzzer Winner Alert -->
+    @if (GameState.Buzzer.WinnerTeam != null)
+    {
+        <div class="buzzer-alert-banner">
+            🔔 @GameState.Buzzer.WinnerTeam.ToUpper()
+            @if (!string.IsNullOrWhiteSpace(GameState.Buzzer.WinnerPlayer))
+            {
+                <span>(@GameState.Buzzer.WinnerPlayer)</span>
+            }
+            BUZZED IN FIRST!
+        </div>
+    }
+
+    <!-- 8-Slot Answer Board (2 columns x 4 rows) -->
+    <div class="feud-board my-4">
+        @for (int slot = 0; slot < 8; slot++)
+        {
+            var answer = slot < GameState.CurrentQuestion.Answers.Count
+                ? GameState.CurrentQuestion.Answers[slot]
+                : null;
+
+            <div class="flip-card @(answer != null && answer.IsRevealed ? "flipped" : "")">
+                <div class="flip-card-inner">
+                    <!-- FRONT (Covered) -->
+                    <div class="flip-card-front">
+                        @if (answer != null)
+                        {
+                            <div class="number-oval">@(slot + 1)</div>
+                        }
+                    </div>
+
+                    <!-- BACK (Revealed) -->
+                    <div class="flip-card-back">
+                        @if (answer != null)
+                        {
+                            <div class="answer-text">@answer.Text</div>
+                            <div class="answer-points">@answer.Points</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Strikes Display -->
+    <div class="strike-row">
+        @for (int s = 1; s <= 3; s++)
+        {
+            <div class="strike-slot @(GameState.Strikes >= s ? "active" : "")">
+                X
+            </div>
+        }
+    </div>
+
+    <!-- Footer join hint -->
+    <div class="text-center mt-4 text-light opacity-50 small">
+        To buzz in, join with your phone at: <strong class="text-warning">/buzzer</strong>
+    </div>
+</div>
+
+<!-- Giant Transient Strike Animation Overlay -->
+@if (_showStrikeOverlay)
+{
+    <div class="giant-strike-overlay" @onclick="() => _showStrikeOverlay = false">
+        <div class="giant-strike-x">
+            @for (int i = 0; i < Math.Max(1, GameState.Strikes); i++)
+            {
+                <span>X</span>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private long _lastBuzzerHandled;
+    private long _lastDingHandled;
+    private long _lastStrikeHandled;
+    private bool _showStrikeOverlay = false;
+
+    protected override void OnInitialized()
+    {
+        GameState.OnChange += HandleStateChanged;
+        _lastBuzzerHandled = GameState.LastBuzzerEventId;
+        _lastDingHandled = GameState.LastDingEventId;
+        _lastStrikeHandled = GameState.LastStrikeEventId;
+    }
+
+    private async void HandleStateChanged()
+    {
+        // Check for Buzzer sound
+        if (GameState.LastBuzzerEventId != _lastBuzzerHandled)
+        {
+            _lastBuzzerHandled = GameState.LastBuzzerEventId;
+            await JS.InvokeVoidAsync("feudAudio.playBuzzer");
+        }
+
+        // Check for Ding sound (Answer revealed)
+        if (GameState.LastDingEventId != _lastDingHandled)
+        {
+            _lastDingHandled = GameState.LastDingEventId;
+            await JS.InvokeVoidAsync("feudAudio.playDing");
+        }
+
+        // Check for Strike sound & visual overlay
+        if (GameState.LastStrikeEventId != _lastStrikeHandled)
+        {
+            _lastStrikeHandled = GameState.LastStrikeEventId;
+            _showStrikeOverlay = true;
+            await JS.InvokeVoidAsync("feudAudio.playStrike");
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(1300);
+                _showStrikeOverlay = false;
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        GameState.OnChange -= HandleStateChanged;
+    }
+}

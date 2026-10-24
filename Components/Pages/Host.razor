@@ -1,0 +1,315 @@
+@page "/host"
+@layout GameLayout
+@inject GameStateService GameState
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="host-container">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+        <div>
+            <h2 class="fw-bold text-info mb-0">🎙️ Game Host Control Desk</h2>
+            <small class="text-light opacity-75">Control buzzers, answers, strikes, and scores in real time</small>
+        </div>
+        <div>
+            <a href="/board" target="_blank" class="btn btn-outline-warning btn-sm me-2">Open TV Board 📺</a>
+            <button class="btn btn-outline-danger btn-sm" @onclick="ConfirmResetGame">Reset Game ⚠️</button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- LEFT COLUMN: Buzzer, Strikes & Scoring -->
+        <div class="col-lg-5">
+            <!-- 1. FACEOFF BUZZER CONTROL -->
+            <div class="host-card border-warning">
+                <h4 class="fw-bold text-warning mb-3">🚨 Face-Off Buzzer Control</h4>
+
+                <div class="p-3 rounded mb-3 @(GameState.Buzzer.WinnerTeam != null ? "bg-danger bg-opacity-25 border border-danger" : GameState.Buzzer.IsActive ? "bg-success bg-opacity-25 border border-success" : "bg-dark")">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Status:</span>
+                        @if (GameState.Buzzer.WinnerTeam != null)
+                        {
+                            <span class="badge bg-danger fs-6">
+                                🔔 BUZZED IN: @GameState.Buzzer.WinnerTeam
+                                @if (!string.IsNullOrWhiteSpace(GameState.Buzzer.WinnerPlayer))
+                                {
+                                    <span>(@GameState.Buzzer.WinnerPlayer)</span>
+                                }
+                            </span>
+                        }
+                        else if (GameState.Buzzer.IsActive)
+                        {
+                            <span class="badge bg-success fs-6 animate__animated animate__pulse animate__infinite">
+                                🟢 ARMED & READY
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary fs-6">IDLE / LOCKED</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success btn-lg fw-bold"
+                            @onclick="() => GameState.ActivateBuzzer()">
+                        ⚡ ARM BUZZERS FOR FACE-OFF
+                    </button>
+                    <button class="btn btn-outline-light"
+                            @onclick="() => GameState.ResetBuzzer()">
+                        🔄 Reset Buzzer
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. STRIKE CONTROLS -->
+            <div class="host-card border-danger">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold text-danger mb-0">❌ Strike Controls</h4>
+                    <span class="badge bg-danger fs-5">
+                        Strikes: @GameState.Strikes / 3
+                    </span>
+                </div>
+
+                <div class="d-grid gap-2 mb-2">
+                    <button class="btn btn-danger btn-lg fw-bold py-3"
+                            @onclick="() => GameState.AddStrike()">
+                        🚨 TRIGGER STRIKE (X)
+                    </button>
+                    <button class="btn btn-outline-secondary"
+                            @onclick="() => GameState.ClearStrikes()">
+                        Clear Strikes
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. BANK & SCORE MANAGEMENT -->
+            <div class="host-card">
+                <h4 class="fw-bold text-light mb-3">💰 Bank & Team Scores</h4>
+
+                <div class="alert alert-warning text-center fw-bold fs-4 mb-3">
+                    Round Bank: @GameState.RoundBank pts
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <button class="btn btn-danger w-100 fw-bold py-2"
+                                @onclick="() => GameState.AwardBank(1)">
+                            Award to @GameState.Team1.Name
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-primary w-100 fw-bold py-2"
+                                @onclick="() => GameState.AwardBank(2)">
+                            Award to @GameState.Team2.Name
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Team score adjust -->
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-2 bg-dark rounded border border-danger text-center">
+                            <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
+                                   @bind="GameState.Team1.Name" />
+                            <div class="display-6 fw-bold text-danger">@GameState.Team1.Score</div>
+                            <div class="btn-group btn-group-sm mt-1">
+                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, -10)">-10</button>
+                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, +10)">+10</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 bg-dark rounded border border-primary text-center">
+                            <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
+                                   @bind="GameState.Team2.Name" />
+                            <div class="display-6 fw-bold text-primary">@GameState.Team2.Score</div>
+                            <div class="btn-group btn-group-sm mt-1">
+                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, -10)">-10</button>
+                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, +10)">+10</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio SFX Test -->
+            <div class="host-card">
+                <h6 class="fw-bold text-light opacity-75 mb-2">Sound Effects Preview</h6>
+                <div class="btn-group btn-group-sm w-100">
+                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playDing")'>Ding 🔔</button>
+                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playStrike")'>Strike ❌</button>
+                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playBuzzer")'>Buzzer 🚨</button>
+                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playWin")'>Fanfare 🎺</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Questions & Answers Board -->
+        <div class="col-lg-7">
+            <div class="host-card border-info">
+                <!-- Round navigation -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <button class="btn btn-outline-info btn-sm"
+                            disabled="@(GameState.CurrentRoundIndex == 0)"
+                            @onclick="() => GameState.PreviousRound()">
+                        ◀ Previous Round
+                    </button>
+                    <span class="fw-bold text-info fs-5">
+                        Round @(GameState.CurrentRoundIndex + 1) of @GameState.Questions.Count
+                        <span class="badge bg-warning text-dark ms-2">@(GameState.CurrentQuestion.Multiplier)X Points</span>
+                    </span>
+                    <button class="btn btn-outline-info btn-sm"
+                            disabled="@(GameState.CurrentRoundIndex + 1 >= GameState.Questions.Count)"
+                            @onclick="() => GameState.NextRound()">
+                        Next Round ▶
+                    </button>
+                </div>
+
+                <!-- Question Title -->
+                <div class="p-3 bg-dark rounded border border-secondary mb-3">
+                    <div class="text-warning small fw-bold mb-1">SURVEY QUESTION:</div>
+                    <h5 class="fw-bold text-white mb-0">@GameState.CurrentQuestion.Text</h5>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="d-flex justify-content-end gap-2 mb-3">
+                    <button class="btn btn-sm btn-outline-light" @onclick="() => GameState.RevealAllAnswers()">
+                        Reveal All
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => GameState.HideAllAnswers()">
+                        Hide All
+                    </button>
+                </div>
+
+                <!-- Answers Table -->
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0">
+                        <thead>
+                            <tr class="text-secondary small">
+                                <th style="width: 50px;">#</th>
+                                <th>Answer</th>
+                                <th style="width: 80px;" class="text-center">Points</th>
+                                <th style="width: 120px;" class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var answer in GameState.CurrentQuestion.Answers)
+                            {
+                                <tr class="@(answer.IsRevealed ? "table-active" : "")">
+                                    <td class="fw-bold text-warning">@answer.Id</td>
+                                    <td>
+                                        <span class="fw-bold @(answer.IsRevealed ? "text-success" : "text-light")">
+                                            @answer.Text
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning text-dark fw-bold fs-6">
+                                            @answer.Points
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm @(answer.IsRevealed ? "btn-secondary" : "btn-warning") fw-bold"
+                                                @onclick="() => GameState.ToggleAnswer(answer.Id)">
+                                            @(answer.IsRevealed ? "Hide" : "Reveal")
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Custom Question Creator -->
+            <div class="host-card mt-3">
+                <h5 class="fw-bold text-light mb-2">➕ Add Custom Question</h5>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control bg-dark text-white border-secondary"
+                           placeholder="Type a custom survey question..." @bind="_customQuestionText" />
+                    <select class="form-select bg-dark text-white border-secondary" style="max-width: 120px;" @bind="_customMultiplier">
+                        <option value="1">1X Pts</option>
+                        <option value="2">2X Pts</option>
+                        <option value="3">3X Pts</option>
+                    </select>
+                </div>
+                <div class="text-secondary small mb-2">Add top answers (separated by commas with points, e.g. "Coffee: 40, Tea: 30, Soda: 15"):</div>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control bg-dark text-white border-secondary"
+                           placeholder="e.g. Pizza: 45, Burgers: 30, Tacos: 15" @bind="_customAnswersRaw" />
+                    <button class="btn btn-info fw-bold" @onclick="AddCustomQuestion">
+                        Add Round
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _customQuestionText = string.Empty;
+    private int _customMultiplier = 1;
+    private string _customAnswersRaw = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        GameState.OnChange += HandleStateChanged;
+    }
+
+    private async void HandleStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ConfirmResetGame()
+    {
+        GameState.ResetGame();
+    }
+
+    private void AddCustomQuestion()
+    {
+        if (string.IsNullOrWhiteSpace(_customQuestionText)) return;
+
+        var question = new Question
+        {
+            Text = _customQuestionText.Trim(),
+            Multiplier = _customMultiplier,
+            Answers = new List<AnswerItem>()
+        };
+
+        if (!string.IsNullOrWhiteSpace(_customAnswersRaw))
+        {
+            var parts = _customAnswersRaw.Split(',');
+            int id = 1;
+            foreach (var part in parts)
+            {
+                var trimmed = part.Trim();
+                if (string.IsNullOrEmpty(trimmed)) continue;
+
+                var subparts = trimmed.Split(':');
+                var text = subparts[0].Trim();
+                int points = 10;
+                if (subparts.Length > 1 && int.TryParse(subparts[1].Trim(), out int parsedPts))
+                {
+                    points = parsedPts;
+                }
+
+                question.Answers.Add(new AnswerItem
+                {
+                    Id = id++,
+                    Text = text,
+                    Points = points,
+                    IsRevealed = false
+                });
+            }
+        }
+
+        GameState.AddQuestion(question);
+        _customQuestionText = string.Empty;
+        _customAnswersRaw = string.Empty;
+    }
+
+    public void Dispose()
+    {
+        GameState.OnChange -= HandleStateChanged;
+    }
+}
