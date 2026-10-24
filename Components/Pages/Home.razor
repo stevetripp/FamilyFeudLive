@@ -129,7 +129,10 @@
         try
         {
             var uri = new Uri(Nav.Uri);
-            _port = uri.Port > 0 ? uri.Port : 5046;
+
+            // Port 7267 is HTTPS, which triggers SSL handshake errors if visited via http://
+            // Default phones to the HTTP port (5046) so local Wi-Fi connections never have SSL warnings
+            _port = (uri.Port == 7267) ? 5046 : (uri.Port > 0 ? uri.Port : 5046);
 
             _availableIps = QrService.GetLocalIPv4Addresses();
             
@@ -147,6 +150,7 @@
         catch
         {
             _selectedIp = "localhost";
+            _port = 5046;
         }
 
         UpdateQrCode();
