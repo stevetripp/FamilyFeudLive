@@ -226,12 +226,16 @@ public class GameStateService
 
                 if (item.Answers != null)
                 {
+                    // Order answers from highest rank (#1) to lowest rank by points
+                    var validAnswers = item.Answers
+                        .Where(a => !string.IsNullOrWhiteSpace(a.Answer) || !string.IsNullOrWhiteSpace(a.Text))
+                        .OrderByDescending(a => a.Points > 0 ? a.Points : (a.PeopleWithAnswer > 0 ? a.PeopleWithAnswer : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10)))
+                        .ToList();
+
                     int answerId = 1;
-                    foreach (var a in item.Answers)
+                    foreach (var a in validAnswers)
                     {
                         var aText = !string.IsNullOrWhiteSpace(a.Answer) ? a.Answer : a.Text;
-                        if (string.IsNullOrWhiteSpace(aText)) continue;
-
                         int points = a.Points > 0
                             ? a.Points
                             : (a.PeopleWithAnswer > 0 ? a.PeopleWithAnswer : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10));
@@ -239,7 +243,7 @@ public class GameStateService
                         question.Answers.Add(new AnswerItem
                         {
                             Id = answerId++,
-                            Text = aText.Trim(),
+                            Text = aText!.Trim(),
                             Points = points,
                             IsRevealed = false
                         });
@@ -452,6 +456,12 @@ public class GameStateService
         lock (_lock)
         {
             question.Id = Questions.Count > 0 ? Questions.Max(q => q.Id) + 1 : 1;
+            // Ensure answers are ordered from highest rank (#1) to lowest rank
+            question.Answers = question.Answers.OrderByDescending(a => a.Points).ToList();
+            for (int i = 0; i < question.Answers.Count; i++)
+            {
+                question.Answers[i].Id = i + 1;
+            }
             Questions.Add(question);
             NotifyStateChanged();
         }

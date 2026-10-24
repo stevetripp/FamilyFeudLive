@@ -440,7 +440,6 @@
         if (!string.IsNullOrWhiteSpace(_customAnswersRaw))
         {
             var parts = _customAnswersRaw.Split(',');
-            int id = 1;
             foreach (var part in parts)
             {
                 var trimmed = part.Trim();
@@ -456,11 +455,16 @@
 
                 question.Answers.Add(new AnswerItem
                 {
-                    Id = id++,
                     Text = text,
                     Points = points,
                     IsRevealed = false
                 });
+            }
+
+            question.Answers = question.Answers.OrderByDescending(a => a.Points).ToList();
+            for (int i = 0; i < question.Answers.Count; i++)
+            {
+                question.Answers[i].Id = i + 1;
             }
         }
 

@@ -211,10 +211,12 @@ body.game-body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
-/* 8-SLOT FEUD BOARD */
+/* 8-SLOT FEUD BOARD (2 columns x 4 rows, column-major: Left 1-4, Right 5-8) */
 .feud-board {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    grid-auto-flow: column;
     gap: 15px;
     background: #061124;
     border: 6px solid var(--feud-gold);
@@ -313,6 +315,52 @@ body.game-body {
     justify-content: center;
     box-shadow: inset 0 0 6px rgba(0,0,0,0.4);
     border: 1px solid #fff;
+}
+
+@media (max-width: 992px) {
+    .feud-board {
+        gap: 10px;
+        padding: 14px;
+    }
+    .flip-card {
+        height: 64px;
+    }
+    .answer-text {
+        font-size: 1.15rem;
+    }
+    .answer-points {
+        font-size: 1.35rem;
+        min-width: 46px;
+        height: 42px;
+    }
+    .number-oval {
+        width: 38px;
+        height: 38px;
+        font-size: 1.35rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .feud-board {
+        gap: 8px;
+        padding: 10px;
+    }
+    .flip-card {
+        height: 54px;
+    }
+    .answer-text {
+        font-size: 0.95rem;
+    }
+    .answer-points {
+        font-size: 1.15rem;
+        min-width: 40px;
+        height: 36px;
+    }
+    .number-oval {
+        width: 32px;
+        height: 32px;
+        font-size: 1.15rem;
+    }
 }
 
 /* STRIKE AREA */
