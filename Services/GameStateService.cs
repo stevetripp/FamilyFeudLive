@@ -26,6 +26,37 @@ public class GameStateService
     public FastMoneyState FastMoney { get; set; } = new();
     private CancellationTokenSource? _fastMoneyTimerCts;
 
+    // Seasonal Theme Support
+    public string CurrentTheme { get; set; } = "classic";
+
+    public static readonly List<ThemeOption> AvailableThemes = new()
+    {
+        new() { Id = "classic", Name = "Classic TV", Icon = "📺", Tagline = "Original Gold & Navy Game Show", PrimaryColor = "#f5b700", SeasonalTitle = "" },
+        new() { Id = "valentines", Name = "Valentine's", Icon = "💖", Tagline = "Romantic Roses & Ruby Red", PrimaryColor = "#ff4d6d", SeasonalTitle = "💖 VALENTINE'S EDITION 💖" },
+        new() { Id = "july4th", Name = "4th of July", Icon = "🎆", Tagline = "Patriotic Red, White & Blue", PrimaryColor = "#e63946", SeasonalTitle = "🎆 4TH OF JULY SPECIAL 🎆" },
+        new() { Id = "halloween", Name = "Halloween", Icon = "🎃", Tagline = "Spooky Pumpkin Orange & Midnight Purple", PrimaryColor = "#ff7b00", SeasonalTitle = "🎃 HALLOWEEN SPOOKTACULAR 🎃" },
+        new() { Id = "thanksgiving", Name = "Thanksgiving", Icon = "🦃", Tagline = "Warm Harvest Amber & Autumn Glow", PrimaryColor = "#e07a5f", SeasonalTitle = "🦃 THANKSGIVING HARVEST 🦃" },
+        new() { Id = "christmas", Name = "Christmas", Icon = "🎄", Tagline = "Festive Holly Green & Candy Cane Red", PrimaryColor = "#2d6a4f", SeasonalTitle = "🎄 CHRISTMAS SPECIAL 🎄" }
+    };
+
+    public void SetTheme(string themeId)
+    {
+        lock (_lock)
+        {
+            if (AvailableThemes.Any(t => t.Id.Equals(themeId, StringComparison.OrdinalIgnoreCase)))
+            {
+                CurrentTheme = themeId.ToLowerInvariant();
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public ThemeOption GetThemeInfo()
+    {
+        return AvailableThemes.FirstOrDefault(t => t.Id.Equals(CurrentTheme, StringComparison.OrdinalIgnoreCase))
+               ?? AvailableThemes[0];
+    }
+
     public event Action? OnChange;
 
     public Question CurrentQuestion =>

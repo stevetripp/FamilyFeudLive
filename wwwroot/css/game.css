@@ -999,3 +999,523 @@ body.game-body {
     display: inline-block;
     animation: duplicateAlert 0.4s infinite alternate;
 }
+
+/* ==================== SEASONAL THEMES ==================== */
+.game-wrapper {
+    min-height: 100vh;
+    transition: background 0.5s ease;
+}
+
+.seasonal-title-pill {
+    display: inline-block;
+    padding: 4px 18px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid currentColor;
+    box-shadow: 0 0 15px currentColor;
+    animation: seasonalPulse 2s infinite alternate;
+}
+
+@keyframes seasonalPulse {
+    0% { transform: scale(1); opacity: 0.85; }
+    100% { transform: scale(1.03); opacity: 1; }
+}
+
+/* 1. VALENTINE'S DAY THEME */
+.theme-valentines {
+    --feud-gold: #ff4d6d;
+    --feud-gold-light: #ffb3c1;
+    --feud-blue-dark: #2b0914;
+    --feud-blue-card: #590d22;
+    --feud-red: #c9184a;
+    --feud-red-glow: rgba(255, 77, 109, 0.6);
+    --feud-strike: #ff4d6d;
+    background: radial-gradient(circle at center, #590d22 0%, #2b0914 50%, #150208 100%);
+    color: #ffccd5;
+}
+
+.theme-valentines .scoreboard-header {
+    background: linear-gradient(180deg, #590d22 0%, #2b0914 100%);
+    border-color: #ff4d6d;
+    box-shadow: 0 0 25px rgba(255, 77, 109, 0.4), inset 0 0 15px rgba(0,0,0,0.5);
+}
+
+.theme-valentines .question-bar {
+    background: linear-gradient(90deg, #440516 0%, #800f2f 50%, #440516 100%);
+    border-color: #ff4d6d;
+}
+
+.theme-valentines .feud-board {
+    background: #1a020a;
+    border-color: #ff4d6d;
+    box-shadow: 0 0 35px rgba(255, 77, 109, 0.4), inset 0 0 30px rgba(0,0,0,0.8);
+}
+
+.theme-valentines .flip-card-front {
+    background: linear-gradient(180deg, #800f2f 0%, #440516 100%);
+    border-color: #a4133c;
+}
+
+.theme-valentines .flip-card-back {
+    background: linear-gradient(180deg, #590d22 0%, #24000b 100%);
+    border-color: #ff758f;
+}
+
+.theme-valentines .number-oval {
+    background: radial-gradient(circle, #ff758f 0%, #c9184a 100%);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(255, 117, 143, 0.8), inset 0 0 5px rgba(0,0,0,0.3);
+}
+
+.theme-valentines .answer-points {
+    background: radial-gradient(circle, #ff4d6d 0%, #c9184a 100%);
+    color: #fff;
+}
+
+.theme-valentines .bank-box {
+    background: radial-gradient(circle, #800f2f 0%, #380411 100%);
+    border-color: #ff758f;
+}
+
+.theme-valentines .round-badge {
+    background: #ff4d6d;
+    color: #fff;
+}
+
+.theme-valentines .fastmoney-header {
+    background: linear-gradient(180deg, #590d22 0%, #2b0914 100%);
+    border-color: #ff4d6d;
+    box-shadow: 0 0 25px rgba(255, 77, 109, 0.4);
+}
+
+.theme-valentines .fm-grid-board {
+    background: #1a020a;
+    border-color: #ff4d6d;
+    box-shadow: 0 0 35px rgba(255, 77, 109, 0.4);
+}
+
+.theme-valentines .fm-column-header {
+    background: linear-gradient(180deg, #800f2f 0%, #440516 100%);
+    border-color: #ff758f;
+    color: #ffccd5;
+}
+
+.theme-valentines .fm-slot {
+    background: linear-gradient(180deg, #590d22 0%, #2e0511 100%);
+    border-color: #800f2f;
+}
+
+.theme-valentines .fm-slot.revealed {
+    background: linear-gradient(180deg, #800f2f 0%, #380411 100%);
+    border-color: #ff758f;
+}
+
+.theme-valentines .fm-slot-points {
+    background: radial-gradient(circle, #ff4d6d 0%, #c9184a 100%);
+    color: #fff;
+}
+
+.theme-valentines .fm-q-badge {
+    background: #ff4d6d;
+    color: #fff;
+}
+
+/* 2. 4TH OF JULY THEME */
+.theme-july4th {
+    --feud-gold: #e63946;
+    --feud-gold-light: #f1faee;
+    --feud-blue-dark: #050f24;
+    --feud-blue-card: #1d3557;
+    --feud-red: #e63946;
+    --feud-red-glow: rgba(230, 57, 70, 0.6);
+    --feud-strike: #e63946;
+    background: radial-gradient(circle at center, #0d2149 0%, #050f24 50%, #1a0408 100%);
+}
+
+.theme-july4th .scoreboard-header {
+    background: linear-gradient(180deg, #1d3557 0%, #0d1e38 100%);
+    border-color: #e63946;
+    box-shadow: 0 0 25px rgba(230, 57, 70, 0.4), inset 0 0 15px rgba(0,0,0,0.5);
+}
+
+.theme-july4th .question-bar {
+    background: linear-gradient(90deg, #1d3557 0%, #457b9d 50%, #1d3557 100%);
+    border-color: #e63946;
+}
+
+.theme-july4th .feud-board {
+    background: #061124;
+    border-color: #e63946;
+    box-shadow: 0 0 35px rgba(230, 57, 70, 0.4), inset 0 0 30px rgba(0,0,0,0.8);
+}
+
+.theme-july4th .flip-card-front {
+    background: linear-gradient(180deg, #1d3557 0%, #0d1e38 100%);
+    border-color: #457b9d;
+}
+
+.theme-july4th .flip-card-back {
+    background: linear-gradient(180deg, #162a45 0%, #08111e 100%);
+    border-color: #e63946;
+}
+
+.theme-july4th .number-oval {
+    background: radial-gradient(circle, #e63946 0%, #9e1b27 100%);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(230, 57, 70, 0.8), inset 0 0 5px rgba(0,0,0,0.3);
+}
+
+.theme-july4th .answer-points {
+    background: radial-gradient(circle, #e63946 0%, #a81d29 100%);
+    color: #fff;
+}
+
+.theme-july4th .bank-box {
+    background: radial-gradient(circle, #1d3557 0%, #0a172a 100%);
+    border-color: #e63946;
+}
+
+.theme-july4th .round-badge {
+    background: #e63946;
+    color: #fff;
+}
+
+.theme-july4th .fastmoney-header {
+    background: linear-gradient(180deg, #1d3557 0%, #0c182b 100%);
+    border-color: #e63946;
+    box-shadow: 0 0 25px rgba(230, 57, 70, 0.4);
+}
+
+.theme-july4th .fm-grid-board {
+    background: #061124;
+    border-color: #e63946;
+    box-shadow: 0 0 35px rgba(230, 57, 70, 0.4);
+}
+
+.theme-july4th .fm-column-header {
+    background: linear-gradient(180deg, #1d3557 0%, #0c182b 100%);
+    border-color: #e63946;
+    color: #f1faee;
+}
+
+.theme-july4th .fm-slot {
+    background: linear-gradient(180deg, #1d3557 0%, #0a172a 100%);
+    border-color: #274773;
+}
+
+.theme-july4th .fm-slot.revealed {
+    background: linear-gradient(180deg, #162a45 0%, #08111e 100%);
+    border-color: #e63946;
+}
+
+.theme-july4th .fm-slot-points {
+    background: radial-gradient(circle, #e63946 0%, #9e1b27 100%);
+    color: #fff;
+}
+
+.theme-july4th .fm-q-badge {
+    background: #e63946;
+    color: #fff;
+}
+
+/* 3. HALLOWEEN THEME */
+.theme-halloween {
+    --feud-gold: #ff7b00;
+    --feud-gold-light: #ffaa00;
+    --feud-blue-dark: #170424;
+    --feud-blue-card: #2b0c3f;
+    --feud-red: #ff3300;
+    --feud-red-glow: rgba(255, 123, 0, 0.6);
+    --feud-strike: #38b000;
+    background: radial-gradient(circle at center, #2b0c3f 0%, #170424 50%, #09020f 100%);
+    color: #ffecd1;
+}
+
+.theme-halloween .scoreboard-header {
+    background: linear-gradient(180deg, #2b0c3f 0%, #170424 100%);
+    border-color: #ff7b00;
+    box-shadow: 0 0 25px rgba(255, 123, 0, 0.4), inset 0 0 15px rgba(0,0,0,0.5);
+}
+
+.theme-halloween .question-bar {
+    background: linear-gradient(90deg, #200730 0%, #431263 50%, #200730 100%);
+    border-color: #ff7b00;
+}
+
+.theme-halloween .feud-board {
+    background: #11031c;
+    border-color: #ff7b00;
+    box-shadow: 0 0 35px rgba(255, 123, 0, 0.4), inset 0 0 30px rgba(0,0,0,0.8);
+}
+
+.theme-halloween .flip-card-front {
+    background: linear-gradient(180deg, #3d155f 0%, #1c072e 100%);
+    border-color: #602096;
+}
+
+.theme-halloween .flip-card-back {
+    background: linear-gradient(180deg, #280b3f 0%, #11021c 100%);
+    border-color: #ff7b00;
+}
+
+.theme-halloween .number-oval {
+    background: radial-gradient(circle, #ffaa00 0%, #ff7b00 100%);
+    color: #111;
+    box-shadow: 0 0 12px rgba(255, 123, 0, 0.9), inset 0 0 5px rgba(0,0,0,0.3);
+}
+
+.theme-halloween .answer-points {
+    background: radial-gradient(circle, #ffaa00 0%, #ff7b00 100%);
+    color: #111;
+}
+
+.theme-halloween .bank-box {
+    background: radial-gradient(circle, #431263 0%, #1a0429 100%);
+    border-color: #ff7b00;
+}
+
+.theme-halloween .round-badge {
+    background: #ff7b00;
+    color: #111;
+}
+
+.theme-halloween .fastmoney-header {
+    background: linear-gradient(180deg, #2b0c3f 0%, #140320 100%);
+    border-color: #ff7b00;
+    box-shadow: 0 0 25px rgba(255, 123, 0, 0.4);
+}
+
+.theme-halloween .fm-grid-board {
+    background: #11031c;
+    border-color: #ff7b00;
+    box-shadow: 0 0 35px rgba(255, 123, 0, 0.4);
+}
+
+.theme-halloween .fm-column-header {
+    background: linear-gradient(180deg, #3d155f 0%, #1c072e 100%);
+    border-color: #ff7b00;
+    color: #ffaa00;
+}
+
+.theme-halloween .fm-slot {
+    background: linear-gradient(180deg, #280b3f 0%, #13031f 100%);
+    border-color: #481570;
+}
+
+.theme-halloween .fm-slot.revealed {
+    background: linear-gradient(180deg, #3d155f 0%, #180326 100%);
+    border-color: #ff7b00;
+}
+
+.theme-halloween .fm-slot-points {
+    background: radial-gradient(circle, #ffaa00 0%, #ff7b00 100%);
+    color: #111;
+}
+
+.theme-halloween .fm-q-badge {
+    background: #ff7b00;
+    color: #111;
+}
+
+/* 4. THANKSGIVING THEME */
+.theme-thanksgiving {
+    --feud-gold: #e07a5f;
+    --feud-gold-light: #f4a261;
+    --feud-blue-dark: #240e03;
+    --feud-blue-card: #421d09;
+    --feud-red: #9e2a2b;
+    --feud-red-glow: rgba(224, 122, 95, 0.6);
+    --feud-strike: #9e2a2b;
+    background: radial-gradient(circle at center, #421d09 0%, #240e03 50%, #120601 100%);
+    color: #fceade;
+}
+
+.theme-thanksgiving .scoreboard-header {
+    background: linear-gradient(180deg, #421d09 0%, #240e03 100%);
+    border-color: #e07a5f;
+    box-shadow: 0 0 25px rgba(224, 122, 95, 0.4), inset 0 0 15px rgba(0,0,0,0.5);
+}
+
+.theme-thanksgiving .question-bar {
+    background: linear-gradient(90deg, #331506 0%, #612708 50%, #331506 100%);
+    border-color: #e07a5f;
+}
+
+.theme-thanksgiving .feud-board {
+    background: #190902;
+    border-color: #e07a5f;
+    box-shadow: 0 0 35px rgba(224, 122, 95, 0.4), inset 0 0 30px rgba(0,0,0,0.8);
+}
+
+.theme-thanksgiving .flip-card-front {
+    background: linear-gradient(180deg, #5e2a0f 0%, #2e1204 100%);
+    border-color: #8c3f16;
+}
+
+.theme-thanksgiving .flip-card-back {
+    background: linear-gradient(180deg, #471e09 0%, #1e0901 100%);
+    border-color: #f4a261;
+}
+
+.theme-thanksgiving .number-oval {
+    background: radial-gradient(circle, #f4a261 0%, #ba5824 100%);
+    color: #111;
+    box-shadow: 0 0 12px rgba(244, 162, 97, 0.8), inset 0 0 5px rgba(0,0,0,0.3);
+}
+
+.theme-thanksgiving .answer-points {
+    background: radial-gradient(circle, #f4a261 0%, #ba5824 100%);
+    color: #111;
+}
+
+.theme-thanksgiving .bank-box {
+    background: radial-gradient(circle, #5e2a0f 0%, #240d02 100%);
+    border-color: #e07a5f;
+}
+
+.theme-thanksgiving .round-badge {
+    background: #f4a261;
+    color: #111;
+}
+
+.theme-thanksgiving .fastmoney-header {
+    background: linear-gradient(180deg, #421d09 0%, #1f0b02 100%);
+    border-color: #e07a5f;
+    box-shadow: 0 0 25px rgba(224, 122, 95, 0.4);
+}
+
+.theme-thanksgiving .fm-grid-board {
+    background: #190902;
+    border-color: #e07a5f;
+    box-shadow: 0 0 35px rgba(224, 122, 95, 0.4);
+}
+
+.theme-thanksgiving .fm-column-header {
+    background: linear-gradient(180deg, #5e2a0f 0%, #2e1204 100%);
+    border-color: #e07a5f;
+    color: #f4a261;
+}
+
+.theme-thanksgiving .fm-slot {
+    background: linear-gradient(180deg, #471e09 0%, #1f0b02 100%);
+    border-color: #6d3012;
+}
+
+.theme-thanksgiving .fm-slot.revealed {
+    background: linear-gradient(180deg, #5e2a0f 0%, #240d02 100%);
+    border-color: #f4a261;
+}
+
+.theme-thanksgiving .fm-slot-points {
+    background: radial-gradient(circle, #f4a261 0%, #ba5824 100%);
+    color: #111;
+}
+
+.theme-thanksgiving .fm-q-badge {
+    background: #f4a261;
+    color: #111;
+}
+
+/* 5. CHRISTMAS THEME */
+.theme-christmas {
+    --feud-gold: #ffd166;
+    --feud-gold-light: #fff3b0;
+    --feud-blue-dark: #072114;
+    --feud-blue-card: #0f3d26;
+    --feud-red: #d90429;
+    --feud-red-glow: rgba(217, 4, 41, 0.6);
+    --feud-strike: #d90429;
+    background: radial-gradient(circle at center, #0f3d26 0%, #072114 50%, #1a0409 100%);
+    color: #e8f5e9;
+}
+
+.theme-christmas .scoreboard-header {
+    background: linear-gradient(180deg, #1b4332 0%, #0c261b 100%);
+    border-color: #ffd166;
+    box-shadow: 0 0 25px rgba(255, 209, 102, 0.35), inset 0 0 15px rgba(0,0,0,0.5);
+}
+
+.theme-christmas .question-bar {
+    background: linear-gradient(90deg, #123324 0%, #235c42 50%, #123324 100%);
+    border-color: #ffd166;
+}
+
+.theme-christmas .feud-board {
+    background: #081e13;
+    border-color: #ffd166;
+    box-shadow: 0 0 35px rgba(255, 209, 102, 0.35), inset 0 0 30px rgba(0,0,0,0.8);
+}
+
+.theme-christmas .flip-card-front {
+    background: linear-gradient(180deg, #1b4332 0%, #092116 100%);
+    border-color: #2d6a4f;
+}
+
+.theme-christmas .flip-card-back {
+    background: linear-gradient(180deg, #143628 0%, #071911 100%);
+    border-color: #ffd166;
+}
+
+.theme-christmas .number-oval {
+    background: radial-gradient(circle, #e63946 0%, #a81826 100%);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(230, 57, 70, 0.8), inset 0 0 5px rgba(0,0,0,0.3);
+}
+
+.theme-christmas .answer-points {
+    background: radial-gradient(circle, #e63946 0%, #a81826 100%);
+    color: #fff;
+}
+
+.theme-christmas .bank-box {
+    background: radial-gradient(circle, #2d6a4f 0%, #0c2419 100%);
+    border-color: #ffd166;
+}
+
+.theme-christmas .round-badge {
+    background: #ffd166;
+    color: #111;
+}
+
+.theme-christmas .fastmoney-header {
+    background: linear-gradient(180deg, #1b4332 0%, #0a2116 100%);
+    border-color: #ffd166;
+    box-shadow: 0 0 25px rgba(255, 209, 102, 0.35);
+}
+
+.theme-christmas .fm-grid-board {
+    background: #081e13;
+    border-color: #ffd166;
+    box-shadow: 0 0 35px rgba(255, 209, 102, 0.35);
+}
+
+.theme-christmas .fm-column-header {
+    background: linear-gradient(180deg, #1b4332 0%, #092116 100%);
+    border-color: #ffd166;
+    color: #fff3b0;
+}
+
+.theme-christmas .fm-slot {
+    background: linear-gradient(180deg, #143628 0%, #081c13 100%);
+    border-color: #22573f;
+}
+
+.theme-christmas .fm-slot.revealed {
+    background: linear-gradient(180deg, #1b4332 0%, #092116 100%);
+    border-color: #ffd166;
+}
+
+.theme-christmas .fm-slot-points {
+    background: radial-gradient(circle, #e63946 0%, #a81826 100%);
+    color: #fff;
+}
+
+.theme-christmas .fm-q-badge {
+    background: #ffd166;
+    color: #111;
+}

@@ -1,6 +1,8 @@
 @inherits LayoutComponentBase
+@inject GameStateService GameState
+@implements IDisposable
 
-<div class="game-wrapper">
+<div class="game-wrapper theme-@GameState.CurrentTheme">
     @Body
 </div>
 
@@ -9,3 +11,20 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        GameState.OnChange += HandleStateChanged;
+    }
+
+    private async void HandleStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        GameState.OnChange -= HandleStateChanged;
+    }
+}

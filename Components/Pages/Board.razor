@@ -9,6 +9,15 @@
 @if (!GameState.FastMoney.IsActive)
 {
     <div class="board-container">
+        @if (!string.IsNullOrEmpty(GameState.GetThemeInfo().SeasonalTitle))
+        {
+            <div class="text-center mb-2">
+                <span class="seasonal-title-pill">
+                    @GameState.GetThemeInfo().SeasonalTitle
+                </span>
+            </div>
+        }
+
         <!-- Top Scoreboard Bar -->
         <div class="scoreboard-header">
             <!-- Team 1 Box -->
@@ -143,6 +152,15 @@ else
 {
     <!-- FAST MONEY AUDIENCE BOARD -->
     <div class="fastmoney-board-container">
+        @if (!string.IsNullOrEmpty(GameState.GetThemeInfo().SeasonalTitle))
+        {
+            <div class="text-center mb-2">
+                <span class="seasonal-title-pill">
+                    @GameState.GetThemeInfo().SeasonalTitle
+                </span>
+            </div>
+        }
+
         <!-- Top Fast Money Header -->
         <div class="fastmoney-header">
             <!-- Winning Team Info -->

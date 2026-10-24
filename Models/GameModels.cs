@@ -102,3 +102,13 @@ public class FastMoneyState
     public int CombinedRevealedTotal => Player1Total + Player2Total;
     public bool HasWonGrandPrize => CombinedRevealedTotal >= 200;
 }
+
+public class ThemeOption
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Icon { get; set; } = string.Empty;
+    public string Tagline { get; set; } = string.Empty;
+    public string PrimaryColor { get; set; } = string.Empty;
+    public string SeasonalTitle { get; set; } = string.Empty;
+}
