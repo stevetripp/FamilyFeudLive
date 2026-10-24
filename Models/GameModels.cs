@@ -36,15 +36,21 @@ public class JsonImportAnswer
 {
     public string? Answer { get; set; }
     public string? Text { get; set; }
-    public int PeopleWithAnswer { get; set; }
     public int Points { get; set; }
+    public int PeopleWithAnswer { get; set; }
 }
 
 public class JsonImportQuestion
 {
     public string? Question { get; set; }
     public string? Text { get; set; }
-    public int PointsPerAnswer { get; set; } = 10;
     public int Multiplier { get; set; } = 1;
+    public int PointsPerAnswer { get; set; }
     public List<JsonImportAnswer>? Answers { get; set; }
+}
+
+public class JsonImportRoot
+{
+    public List<JsonImportQuestion>? Rounds { get; set; }
+    public List<JsonImportQuestion>? Questions { get; set; }
 }

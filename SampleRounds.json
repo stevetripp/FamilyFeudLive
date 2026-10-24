@@ -1,0 +1,134 @@
+{
+  "Rounds": [
+    {
+      "Multiplier": 1,
+      "Question": "Name something you might find in a teacher's desk.",
+      "Answers": [
+        {
+          "Answer": "Pens / Pencils",
+          "Points": 42
+        },
+        {
+          "Answer": "Apples / Snacks",
+          "Points": 23
+        },
+        {
+          "Answer": "Paperclips / Rubber bands",
+          "Points": 15
+        },
+        {
+          "Answer": "Grade book",
+          "Points": 11
+        },
+        {
+          "Answer": "Confiscated items / Toys",
+          "Points": 9
+        }
+      ]
+    },
+    {
+      "Multiplier": 1,
+      "Question": "Name a place where people are expected to be quiet.",
+      "Answers": [
+        {
+          "Answer": "Library",
+          "Points": 54
+        },
+        {
+          "Answer": "Movie theater",
+          "Points": 21
+        },
+        {
+          "Answer": "Church / Place of worship",
+          "Points": 14
+        },
+        {
+          "Answer": "Hospital / Doctor's office",
+          "Points": 7
+        },
+        {
+          "Answer": "Courtroom",
+          "Points": 4
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name something people often lose.",
+      "Answers": [
+        {
+          "Answer": "Keys",
+          "Points": 45
+        },
+        {
+          "Answer": "Phone",
+          "Points": 26
+        },
+        {
+          "Answer": "Wallet / Purse",
+          "Points": 14
+        },
+        {
+          "Answer": "Socks",
+          "Points": 9
+        },
+        {
+          "Answer": "Glasses / Sunglasses",
+          "Points": 6
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name a reason why someone might stay up all night.",
+      "Answers": [
+        {
+          "Answer": "Studying / Work",
+          "Points": 38
+        },
+        {
+          "Answer": "Partying / Socializing",
+          "Points": 27
+        },
+        {
+          "Answer": "Insomnia / Can't sleep",
+          "Points": 18
+        },
+        {
+          "Answer": "Binge-watching TV / Gaming",
+          "Points": 12
+        },
+        {
+          "Answer": "Sick child / Baby",
+          "Points": 5
+        }
+      ]
+    },
+    {
+      "Multiplier": 3,
+      "Question": "Name a food that tastes great even when served cold.",
+      "Answers": [
+        {
+          "Answer": "Pizza",
+          "Points": 58
+        },
+        {
+          "Answer": "Ice cream",
+          "Points": 20
+        },
+        {
+          "Answer": "Fried chicken",
+          "Points": 11
+        },
+        {
+          "Answer": "Chocolate",
+          "Points": 7
+        },
+        {
+          "Answer": "Sub sandwich",
+          "Points": 4
+        }
+      ]
+    }
+  ]
+}

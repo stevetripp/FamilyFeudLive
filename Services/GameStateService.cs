@@ -7,8 +7,8 @@ public class GameStateService
 {
     private readonly object _lock = new();
 
-    public Team Team1 { get; set; } = new() { Name = "Team Red", Color = "#e63946", Score = 0 };
-    public Team Team2 { get; set; } = new() { Name = "Team Blue", Color = "#1d3557", Score = 0 };
+    public Team Team1 { get; set; } = new() { Name = "Team Red", Color = "#ff4d6d", Score = 0 };
+    public Team Team2 { get; set; } = new() { Name = "Team Blue", Color = "#00b4d8", Score = 0 };
 
     public List<Question> Questions { get; set; } = new();
     public int CurrentRoundIndex { get; private set; } = 0;
@@ -137,7 +137,39 @@ public class GameStateService
                 PropertyNameCaseInsensitive = true
             };
 
-            var imported = JsonSerializer.Deserialize<List<JsonImportQuestion>>(json, options);
+            List<JsonImportQuestion>? imported = null;
+
+            // 1. Try root object with "Rounds" or "Questions" array: { "Rounds": [ ... ] }
+            try
+            {
+                var root = JsonSerializer.Deserialize<JsonImportRoot>(json, options);
+                if (root?.Rounds != null && root.Rounds.Count > 0)
+                {
+                    imported = root.Rounds;
+                }
+                else if (root?.Questions != null && root.Questions.Count > 0)
+                {
+                    imported = root.Questions;
+                }
+            }
+            catch
+            {
+                // continue to array parsing
+            }
+
+            // 2. If not found in root object, try top-level array: [ ... ]
+            if (imported == null || imported.Count == 0)
+            {
+                try
+                {
+                    imported = JsonSerializer.Deserialize<List<JsonImportQuestion>>(json, options);
+                }
+                catch
+                {
+                    // ignore
+                }
+            }
+
             if (imported == null || imported.Count == 0)
             {
                 return 0;
@@ -159,10 +191,9 @@ public class GameStateService
                 var qText = !string.IsNullOrWhiteSpace(item.Question) ? item.Question : item.Text;
                 if (string.IsNullOrWhiteSpace(qText)) continue;
 
-                // Multiplier: user specified, or progressive Feud ladder (1x for first 2 rounds, 2x for next 2, 3x for 5+)
                 int totalRoundsBefore = Questions.Count;
                 int defaultMultiplier = totalRoundsBefore < 2 ? 1 : (totalRoundsBefore < 4 ? 2 : 3);
-                int multiplier = item.Multiplier > 0 && item.Multiplier != 1 ? item.Multiplier : defaultMultiplier;
+                int multiplier = item.Multiplier > 0 ? item.Multiplier : defaultMultiplier;
 
                 var question = new Question
                 {
@@ -180,9 +211,9 @@ public class GameStateService
                         var aText = !string.IsNullOrWhiteSpace(a.Answer) ? a.Answer : a.Text;
                         if (string.IsNullOrWhiteSpace(aText)) continue;
 
-                        int points = a.PeopleWithAnswer > 0
-                            ? a.PeopleWithAnswer
-                            : (a.Points > 0 ? a.Points : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10));
+                        int points = a.Points > 0
+                            ? a.Points
+                            : (a.PeopleWithAnswer > 0 ? a.PeopleWithAnswer : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10));
 
                         question.Answers.Add(new AnswerItem
                         {

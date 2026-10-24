@@ -224,7 +224,7 @@
             <div class="host-card mt-3 border-secondary">
                 <h5 class="fw-bold text-warning mb-2">📥 Import Questions Pack (JSON)</h5>
                 <p class="text-secondary small mb-3">
-                    Import question sets formatted with <code>Question</code>, <code>Answers</code>, and <code>PeopleWithAnswer</code> (matching <code>TextFile.json</code>).
+                    Import question sets with <code>Rounds</code>, <code>Question</code>, <code>Multiplier</code>, and <code>Answers</code> (matching <code>SampleRounds.json</code>).
                 </p>
 
                 @if (!string.IsNullOrEmpty(_importSuccessMessage))
@@ -256,8 +256,8 @@
                 </div>
 
                 <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-sm btn-outline-warning fw-bold" @onclick="LoadSampleTextFile">
-                        📄 Load "TextFile.json" Pack
+                    <button class="btn btn-sm btn-outline-warning fw-bold" @onclick="LoadSampleRoundsFile">
+                        📄 Load "SampleRounds.json" Pack
                     </button>
                     <button class="btn btn-sm btn-outline-info" @onclick="() => _showPasteJson = !_showPasteJson">
                         @(_showPasteJson ? "Hide Paste Area" : "📋 Paste Raw JSON")
@@ -268,7 +268,7 @@
                 {
                     <div class="mt-3">
                         <textarea class="form-control bg-dark text-white border-secondary font-monospace small mb-2"
-                                  rows="6" placeholder="Paste JSON array here..." @bind="_pastedJsonText"></textarea>
+                                  rows="6" placeholder="Paste JSON array or { &quot;Rounds&quot;: [...] } here..." @bind="_pastedJsonText"></textarea>
                         <button class="btn btn-sm btn-success fw-bold" @onclick="ImportPastedJson">
                             Import Pasted JSON
                         </button>
@@ -357,7 +357,7 @@
         }
     }
 
-    private void LoadSampleTextFile()
+    private void LoadSampleRoundsFile()
     {
         _importSuccessMessage = null;
         _importErrorMessage = null;
@@ -366,15 +366,15 @@
         {
             var searchPaths = new[]
             {
-                Path.Combine(AppContext.BaseDirectory, "TextFile.json"),
-                Path.Combine(Directory.GetCurrentDirectory(), "TextFile.json"),
-                @"D:\Src\FamilyFeudLive\TextFile.json"
+                Path.Combine(AppContext.BaseDirectory, "SampleRounds.json"),
+                Path.Combine(Directory.GetCurrentDirectory(), "SampleRounds.json"),
+                @"D:\Src\FamilyFeudLive\SampleRounds.json"
             };
 
             var path = searchPaths.FirstOrDefault(File.Exists);
             if (path == null)
             {
-                _importErrorMessage = "Could not find 'TextFile.json' on the server.";
+                _importErrorMessage = "Could not find 'SampleRounds.json' on the server.";
                 return;
             }
 
@@ -382,16 +382,16 @@
             int count = GameState.ImportQuestionsFromJson(json, _replaceExistingOnImport);
             if (count > 0)
             {
-                _importSuccessMessage = $"Successfully imported {count} rounds from TextFile.json!";
+                _importSuccessMessage = $"Successfully imported {count} rounds from SampleRounds.json!";
             }
             else
             {
-                _importErrorMessage = "No valid questions were found in TextFile.json.";
+                _importErrorMessage = "No valid questions were found in SampleRounds.json.";
             }
         }
         catch (Exception ex)
         {
-            _importErrorMessage = $"Error loading TextFile.json: {ex.Message}";
+            _importErrorMessage = $"Error loading SampleRounds.json: {ex.Message}";
         }
     }
 
