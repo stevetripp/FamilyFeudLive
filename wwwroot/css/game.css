@@ -551,3 +551,427 @@ body.game-body {
     right: 0.75rem;
     top: 0.5rem;
 }
+
+/* ==================== FAST MONEY BOARD STYLES ==================== */
+.fastmoney-board-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+.fastmoney-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, #162c54 0%, #0c1a33 100%);
+    border: 3px solid var(--feud-gold);
+    border-radius: 16px;
+    padding: 15px 25px;
+    box-shadow: 0 0 25px rgba(245, 183, 0, 0.35), inset 0 0 15px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.fm-team-card {
+    text-align: left;
+    min-width: 200px;
+}
+
+.fm-team-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--feud-gold);
+    text-transform: uppercase;
+}
+
+.fm-team-name {
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px var(--team-glow, rgba(255, 255, 255, 0.6)), 2px 2px 4px #000;
+    line-height: 1.2;
+}
+
+.fm-title-box {
+    text-align: center;
+    flex: 1;
+}
+
+.fm-title-badge {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--feud-gold-light);
+    text-shadow: 0 0 18px rgba(245, 183, 0, 0.9), 2px 2px 0 #000;
+}
+
+.fm-player-indicator {
+    display: inline-block;
+    background: #0077b6;
+    color: #fff;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.fm-timer-card {
+    text-align: center;
+    background: radial-gradient(circle, #1a233a 0%, #080d1a 100%);
+    border: 3px solid #3361a8;
+    border-radius: 14px;
+    padding: 8px 24px;
+    min-width: 130px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    transition: all 0.3s ease;
+}
+
+.fm-timer-card.running {
+    border-color: #f5b700;
+    box-shadow: 0 0 20px rgba(245, 183, 0, 0.6), inset 0 0 10px rgba(0,0,0,0.8);
+    animation: timerPulse 1s infinite alternate;
+}
+
+@keyframes timerPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.03); }
+}
+
+.fm-timer-card.critical {
+    border-color: #ef233c;
+    box-shadow: 0 0 25px rgba(239, 35, 60, 0.9), inset 0 0 10px rgba(0,0,0,0.8);
+    animation: timerCritical 0.5s infinite alternate;
+}
+
+@keyframes timerCritical {
+    0% { transform: scale(1); color: #fff; }
+    100% { transform: scale(1.06); color: #ef233c; }
+}
+
+.fm-timer-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--feud-gold);
+    letter-spacing: 1.5px;
+}
+
+.fm-timer-digit {
+    font-size: 3.4rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #fff;
+    font-family: 'Courier New', monospace, sans-serif;
+}
+
+.fm-total-card {
+    text-align: center;
+    background: radial-gradient(circle, #203f75 0%, #0c1c38 100%);
+    border: 3px solid var(--feud-gold);
+    border-radius: 14px;
+    padding: 8px 28px;
+    min-width: 170px;
+    box-shadow: 0 0 20px rgba(245, 183, 0, 0.4);
+}
+
+.fm-total-card.winner-pulse {
+    border-color: #52b788;
+    box-shadow: 0 0 35px rgba(82, 183, 136, 0.9);
+    animation: winCardPulse 1s infinite alternate;
+}
+
+@keyframes winCardPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+.fm-total-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--feud-gold);
+    letter-spacing: 1.5px;
+}
+
+.fm-total-score {
+    font-size: 3.4rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    text-shadow: 0 0 15px #fff, 0 0 25px var(--feud-gold);
+}
+
+.fm-total-target {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--feud-gold-light);
+    letter-spacing: 1px;
+}
+
+/* Duplicate Banner */
+.fm-duplicate-banner {
+    background: linear-gradient(90deg, #d90429 0%, #7f0014 50%, #d90429 100%);
+    border: 3px solid #ffccd5;
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 12px #fff, 2px 2px 4px #000;
+    box-shadow: 0 0 30px rgba(217, 4, 41, 0.8);
+    margin-bottom: 20px;
+    animation: duplicateAlert 0.4s infinite alternate;
+}
+
+@keyframes duplicateAlert {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.02); box-shadow: 0 0 45px rgba(255, 0, 50, 1); }
+}
+
+/* Fast Money Grid */
+.fm-grid-board {
+    background: #061124;
+    border: 5px solid var(--feud-gold);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 35px rgba(245, 183, 0, 0.4), inset 0 0 30px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fm-column-header-row {
+    display: grid;
+    grid-template-columns: 1fr 140px 1fr;
+    gap: 15px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.fm-column-header {
+    background: linear-gradient(180deg, #1b3d75 0%, #0d2144 100%);
+    border: 2px solid #3361a8;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--feud-gold-light);
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.fm-column-header-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #8892b0;
+    letter-spacing: 1px;
+}
+
+.fm-row-item {
+    display: grid;
+    grid-template-columns: 1fr 140px 1fr;
+    gap: 15px;
+    align-items: center;
+}
+
+.fm-slot {
+    background: linear-gradient(180deg, #142a52 0%, #08162d 100%);
+    border: 2px solid #234b8c;
+    border-radius: 10px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+}
+
+.fm-slot.revealed {
+    background: linear-gradient(180deg, #0e2a56 0%, #061733 100%);
+    border-color: var(--feud-gold);
+    box-shadow: 0 0 12px rgba(245, 183, 0, 0.3);
+}
+
+.fm-slot.duplicate-highlight {
+    border-color: #ef233c !important;
+    box-shadow: 0 0 15px rgba(239, 35, 60, 0.7);
+}
+
+.fm-slot-answer {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    padding-right: 10px;
+    letter-spacing: 0.5px;
+}
+
+.fm-slot-points {
+    background: radial-gradient(circle, #f5b700 0%, #e09f00 100%);
+    color: #111;
+    font-size: 1.5rem;
+    font-weight: 900;
+    min-width: 52px;
+    height: 44px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.4);
+    border: 1px solid #fff;
+    visibility: hidden;
+}
+
+.fm-slot-points.points-active {
+    visibility: visible;
+}
+
+.fm-slot-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4px;
+}
+
+.fm-q-badge {
+    background: var(--feud-gold);
+    color: #000;
+    font-weight: 900;
+    font-size: 0.95rem;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin-bottom: 2px;
+}
+
+.fm-q-text {
+    font-size: 0.72rem;
+    color: #ccd6f6;
+    font-weight: 600;
+    max-height: 38px;
+    overflow: hidden;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+}
+
+.fm-win-celebration {
+    margin-top: 25px;
+    background: linear-gradient(90deg, #1b4332 0%, #2d6a4f 50%, #1b4332 100%);
+    border: 4px solid #52b788;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(82, 183, 136, 0.9);
+    animation: winCelebrationAnim 1.2s infinite alternate;
+}
+
+@keyframes winCelebrationAnim {
+    0% { transform: scale(1); box-shadow: 0 0 35px rgba(82, 183, 136, 0.7); }
+    100% { transform: scale(1.02); box-shadow: 0 0 60px rgba(82, 183, 136, 1); }
+}
+
+.fm-win-sparkle {
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: #ffeaa7;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px #fff, 2px 2px 4px #000;
+}
+
+.fm-win-subtitle {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 992px) {
+    .fm-column-header-row,
+    .fm-row-item {
+        grid-template-columns: 1fr 100px 1fr;
+        gap: 8px;
+    }
+    .fm-slot {
+        height: 54px;
+        padding: 0 8px;
+    }
+    .fm-slot-answer {
+        font-size: 1.05rem;
+    }
+    .fm-slot-points {
+        min-width: 40px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
+    .fm-timer-digit,
+    .fm-total-score {
+        font-size: 2.6rem;
+    }
+}
+
+/* Fast Money Host Desk */
+.fm-host-card {
+    background: #0d1b2a;
+    border: 1px solid #1e3a8a;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.fm-host-qcard {
+    background: #0a1128;
+    border: 1px solid #1c2e4a;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.fm-host-qheader {
+    border-bottom: 1px solid #1f3358;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.fm-quick-btn {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #142a52;
+    color: #ffeaa7;
+    border: 1px solid #274577;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.fm-quick-btn:hover {
+    background: #f5b700;
+    color: #000;
+    font-weight: 700;
+}
+
+.fm-duplicate-badge {
+    background: #d90429;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    display: inline-block;
+    animation: duplicateAlert 0.4s infinite alternate;
+}

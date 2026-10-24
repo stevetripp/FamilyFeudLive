@@ -5,10 +5,10 @@
 @implements IDisposable
 
 <div class="host-container">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
         <div>
             <h2 class="fw-bold text-info mb-0">🎙️ Game Host Control Desk</h2>
-            <small class="text-light opacity-75">Control buzzers, answers, strikes, and scores in real time</small>
+            <small class="text-light opacity-75">Control buzzers, answers, strikes, and Fast Money in real time</small>
         </div>
         <div>
             <a href="/board" target="_blank" class="btn btn-outline-warning btn-sm me-2">Open TV Board 📺</a>
@@ -16,292 +16,605 @@
         </div>
     </div>
 
-    <div class="row g-4">
-        <!-- LEFT COLUMN: Buzzer, Strikes & Scoring -->
-        <div class="col-lg-5">
-            <!-- 1. FACEOFF BUZZER CONTROL -->
-            <div class="host-card border-warning">
-                <h4 class="fw-bold text-warning mb-3">🚨 Face-Off Buzzer Control</h4>
+    <!-- Mode Switcher Tabs -->
+    <ul class="nav nav-pills mb-4 gap-2">
+        <li class="nav-item">
+            <button class="nav-link @(!_isFastMoneyTab ? "active bg-info text-dark fw-bold" : "text-light bg-dark border border-secondary")"
+                    @onclick="() => _isFastMoneyTab = false">
+                🎯 Main Game Rounds
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(_isFastMoneyTab ? "active bg-warning text-dark fw-bold" : "text-warning bg-dark border border-warning")"
+                    @onclick="() => _isFastMoneyTab = true">
+                ⚡ Fast Money Round
+                @if (GameState.FastMoney.IsActive)
+                {
+                    <span class="badge bg-danger ms-2">LIVE ON TV</span>
+                }
+            </button>
+        </li>
+    </ul>
 
-                <div class="p-3 rounded mb-3 @(GameState.Buzzer.WinnerTeam != null ? "bg-danger bg-opacity-25 border border-danger" : GameState.Buzzer.IsActive ? "bg-success bg-opacity-25 border border-success" : "bg-dark")">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Status:</span>
-                        @if (GameState.Buzzer.WinnerTeam != null)
-                        {
-                            <span class="badge bg-danger fs-6">
-                                🔔 BUZZED IN: @GameState.Buzzer.WinnerTeam
-                                @if (!string.IsNullOrWhiteSpace(GameState.Buzzer.WinnerPlayer))
-                                {
-                                    <span>(@GameState.Buzzer.WinnerPlayer)</span>
-                                }
-                            </span>
-                        }
-                        else if (GameState.Buzzer.IsActive)
-                        {
-                            <span class="badge bg-success fs-6 animate__animated animate__pulse animate__infinite">
-                                🟢 ARMED & READY
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary fs-6">IDLE / LOCKED</span>
-                        }
-                    </div>
-                </div>
+    @if (!_isFastMoneyTab)
+    {
+        <!-- ==================== MAIN GAME CONTROLS ==================== -->
+        <div class="row g-4">
+            <!-- LEFT COLUMN: Buzzer, Strikes & Scoring -->
+            <div class="col-lg-5">
+                <!-- 1. FACEOFF BUZZER CONTROL -->
+                <div class="host-card border-warning">
+                    <h4 class="fw-bold text-warning mb-3">🚨 Face-Off Buzzer Control</h4>
 
-                <div class="d-grid gap-2">
-                    <button class="btn btn-success btn-lg fw-bold"
-                            @onclick="() => GameState.ActivateBuzzer()">
-                        ⚡ ARM BUZZERS FOR FACE-OFF
-                    </button>
-                    <button class="btn btn-outline-light"
-                            @onclick="() => GameState.ResetBuzzer()">
-                        🔄 Reset Buzzer
-                    </button>
-                </div>
-            </div>
-
-            <!-- 2. STRIKE CONTROLS -->
-            <div class="host-card border-danger">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="fw-bold text-danger mb-0">❌ Strike Controls</h4>
-                    <span class="badge bg-danger fs-5">
-                        Strikes: @GameState.Strikes / 3
-                    </span>
-                </div>
-
-                <div class="d-grid gap-2 mb-2">
-                    <button class="btn btn-danger btn-lg fw-bold py-3"
-                            @onclick="() => GameState.AddStrike()">
-                        🚨 TRIGGER STRIKE (X)
-                    </button>
-                    <button class="btn btn-outline-secondary"
-                            @onclick="() => GameState.ClearStrikes()">
-                        Clear Strikes
-                    </button>
-                </div>
-            </div>
-
-            <!-- 3. BANK & SCORE MANAGEMENT -->
-            <div class="host-card">
-                <h4 class="fw-bold text-light mb-3">💰 Bank & Team Scores</h4>
-
-                <div class="alert alert-warning text-center fw-bold fs-4 mb-3">
-                    Round Bank: @GameState.RoundBank pts
-                </div>
-
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <button class="btn btn-danger w-100 fw-bold py-2"
-                                @onclick="() => GameState.AwardBank(1)">
-                            Award to @GameState.Team1.Name
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-primary w-100 fw-bold py-2"
-                                @onclick="() => GameState.AwardBank(2)">
-                            Award to @GameState.Team2.Name
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Team score adjust -->
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="p-2 bg-dark rounded border border-danger text-center">
-                            <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
-                                   @bind="GameState.Team1.Name" />
-                            <div class="display-6 fw-bold text-danger">@GameState.Team1.Score</div>
-                            <div class="btn-group btn-group-sm mt-1">
-                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, -10)">-10</button>
-                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, +10)">+10</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="p-2 bg-dark rounded border border-primary text-center">
-                            <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
-                                   @bind="GameState.Team2.Name" />
-                            <div class="display-6 fw-bold text-primary">@GameState.Team2.Score</div>
-                            <div class="btn-group btn-group-sm mt-1">
-                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, -10)">-10</button>
-                                <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, +10)">+10</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Audio SFX Test -->
-            <div class="host-card">
-                <h6 class="fw-bold text-light opacity-75 mb-2">Sound Effects Preview</h6>
-                <div class="btn-group btn-group-sm w-100">
-                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playDing")'>Ding 🔔</button>
-                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playStrike")'>Strike ❌</button>
-                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playBuzzer")'>Buzzer 🚨</button>
-                    <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playWin")'>Fanfare 🎺</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT COLUMN: Questions & Answers Board -->
-        <div class="col-lg-7">
-            <div class="host-card border-info">
-                <!-- Round navigation -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <button class="btn btn-outline-info btn-sm"
-                            disabled="@(GameState.CurrentRoundIndex == 0)"
-                            @onclick="() => GameState.PreviousRound()">
-                        ◀ Previous Round
-                    </button>
-                    <span class="fw-bold text-info fs-5">
-                        Round @(GameState.CurrentRoundIndex + 1) of @GameState.Questions.Count
-                        <span class="badge bg-warning text-dark ms-2">@(GameState.CurrentQuestion.Multiplier)X Points</span>
-                    </span>
-                    <button class="btn btn-outline-info btn-sm"
-                            disabled="@(GameState.CurrentRoundIndex + 1 >= GameState.Questions.Count)"
-                            @onclick="() => GameState.NextRound()">
-                        Next Round ▶
-                    </button>
-                </div>
-
-                <!-- Question Title -->
-                <div class="p-3 bg-dark rounded border border-secondary mb-3">
-                    <div class="text-warning small fw-bold mb-1">SURVEY QUESTION:</div>
-                    <h5 class="fw-bold text-white mb-0">@GameState.CurrentQuestion.Text</h5>
-                </div>
-
-                <!-- Quick actions -->
-                <div class="d-flex justify-content-end gap-2 mb-3">
-                    <button class="btn btn-sm btn-outline-light" @onclick="() => GameState.RevealAllAnswers()">
-                        Reveal All
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => GameState.HideAllAnswers()">
-                        Hide All
-                    </button>
-                </div>
-
-                <!-- Answers Table -->
-                <div class="table-responsive">
-                    <table class="table table-dark table-hover align-middle mb-0">
-                        <thead>
-                            <tr class="text-secondary small">
-                                <th style="width: 50px;">#</th>
-                                <th>Answer</th>
-                                <th style="width: 80px;" class="text-center">Points</th>
-                                <th style="width: 120px;" class="text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var answer in GameState.CurrentQuestion.Answers)
+                    <div class="p-3 rounded mb-3 @(GameState.Buzzer.WinnerTeam != null ? "bg-danger bg-opacity-25 border border-danger" : GameState.Buzzer.IsActive ? "bg-success bg-opacity-25 border border-success" : "bg-dark")">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Status:</span>
+                            @if (GameState.Buzzer.WinnerTeam != null)
                             {
-                                <tr class="@(answer.IsRevealed ? "table-active" : "")">
-                                    <td class="fw-bold text-warning">@answer.Id</td>
-                                    <td>
-                                        <span class="fw-bold @(answer.IsRevealed ? "text-success" : "text-light")">
-                                            @answer.Text
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-warning text-dark fw-bold fs-6">
-                                            @answer.Points
-                                        </span>
-                                    </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm @(answer.IsRevealed ? "btn-secondary" : "btn-warning") fw-bold"
-                                                @onclick="() => GameState.ToggleAnswer(answer.Id)">
-                                            @(answer.IsRevealed ? "Hide" : "Reveal")
-                                        </button>
-                                    </td>
-                                </tr>
+                                <span class="badge bg-danger fs-6">
+                                    🔔 BUZZED IN: @GameState.Buzzer.WinnerTeam
+                                    @if (!string.IsNullOrWhiteSpace(GameState.Buzzer.WinnerPlayer))
+                                    {
+                                        <span>(@GameState.Buzzer.WinnerPlayer)</span>
+                                    }
+                                </span>
                             }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- JSON Questions Import -->
-            <div class="host-card mt-3 border-secondary">
-                <h5 class="fw-bold text-warning mb-2">📥 Import Questions Pack (JSON)</h5>
-                <p class="text-secondary small mb-3">
-                    Import question sets with <code>Rounds</code>, <code>Question</code>, <code>Multiplier</code>, and <code>Answers</code> (matching <code>SampleRounds.json</code>).
-                </p>
-
-                @if (!string.IsNullOrEmpty(_importSuccessMessage))
-                {
-                    <div class="alert alert-success alert-dismissible fade show py-2 small mb-3">
-                        @_importSuccessMessage
-                        <button type="button" class="btn-close btn-close-white" @onclick="() => _importSuccessMessage = null"></button>
+                            else if (GameState.Buzzer.IsActive)
+                            {
+                                <span class="badge bg-success fs-6">
+                                    🟢 ARMED & READY
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6">IDLE / LOCKED</span>
+                            }
+                        </div>
                     </div>
-                }
 
-                @if (!string.IsNullOrEmpty(_importErrorMessage))
-                {
-                    <div class="alert alert-danger alert-dismissible fade show py-2 small mb-3">
-                        @_importErrorMessage
-                        <button type="button" class="btn-close btn-close-white" @onclick="() => _importErrorMessage = null"></button>
-                    </div>
-                }
-
-                <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="replaceToggle" @bind="_replaceExistingOnImport" />
-                    <label class="form-check-label text-light small fw-bold" for="replaceToggle">
-                        Replace existing questions (unchecked = append as new rounds)
-                    </label>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label text-secondary small fw-bold mb-1">Upload .JSON File:</label>
-                    <InputFile OnChange="HandleFileUpload" accept=".json" class="form-control form-control-sm bg-dark text-white border-secondary" />
-                </div>
-
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-sm btn-outline-warning fw-bold" @onclick="LoadSampleRoundsFile">
-                        📄 Load "SampleRounds.json" Pack
-                    </button>
-                    <button class="btn btn-sm btn-outline-info" @onclick="() => _showPasteJson = !_showPasteJson">
-                        @(_showPasteJson ? "Hide Paste Area" : "📋 Paste Raw JSON")
-                    </button>
-                </div>
-
-                @if (_showPasteJson)
-                {
-                    <div class="mt-3">
-                        <textarea class="form-control bg-dark text-white border-secondary font-monospace small mb-2"
-                                  rows="6" placeholder="Paste JSON array or { &quot;Rounds&quot;: [...] } here..." @bind="_pastedJsonText"></textarea>
-                        <button class="btn btn-sm btn-success fw-bold" @onclick="ImportPastedJson">
-                            Import Pasted JSON
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success btn-lg fw-bold"
+                                @onclick="() => GameState.ActivateBuzzer()">
+                            ⚡ ARM BUZZERS FOR FACE-OFF
+                        </button>
+                        <button class="btn btn-outline-light"
+                                @onclick="() => GameState.ResetBuzzer()">
+                            🔄 Reset Buzzer
                         </button>
                     </div>
-                }
+                </div>
+
+                <!-- 2. STRIKE CONTROLS -->
+                <div class="host-card border-danger">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold text-danger mb-0">❌ Strike Controls</h4>
+                        <span class="badge bg-danger fs-5">
+                            Strikes: @GameState.Strikes / 3
+                        </span>
+                    </div>
+
+                    <div class="d-grid gap-2 mb-2">
+                        <button class="btn btn-danger btn-lg fw-bold py-3"
+                                @onclick="() => GameState.AddStrike()">
+                            🚨 TRIGGER STRIKE (X)
+                        </button>
+                        <button class="btn btn-outline-secondary"
+                                @onclick="() => GameState.ClearStrikes()">
+                            Clear Strikes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. ROUND BANK & SCORES -->
+                <div class="host-card border-success">
+                    <h4 class="fw-bold text-success mb-2">💰 Round Bank & Scoring</h4>
+                    <div class="p-3 bg-dark rounded border border-warning text-center mb-3">
+                        <div class="text-secondary small fw-bold">CURRENT ROUND BANK</div>
+                        <div class="display-5 fw-bold text-warning">@GameState.RoundBank</div>
+                        <div class="text-muted small">
+                            Multiplier: <span class="fw-bold text-light">@(GameState.CurrentQuestion.Multiplier)X</span>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <button class="btn btn-danger w-100 fw-bold py-2"
+                                    @onclick="() => GameState.AwardBank(1)">
+                                Award to @GameState.Team1.Name
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary w-100 fw-bold py-2"
+                                    @onclick="() => GameState.AwardBank(2)">
+                                Award to @GameState.Team2.Name
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Team score adjust -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-2 bg-dark rounded border border-danger text-center">
+                                <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
+                                       @bind="GameState.Team1.Name" />
+                                <div class="display-6 fw-bold text-danger">@GameState.Team1.Score</div>
+                                <div class="btn-group btn-group-sm mt-1">
+                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, -10)">-10</button>
+                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, +10)">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 bg-dark rounded border border-primary text-center">
+                                <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
+                                       @bind="GameState.Team2.Name" />
+                                <div class="display-6 fw-bold text-primary">@GameState.Team2.Score</div>
+                                <div class="btn-group btn-group-sm mt-1">
+                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, -10)">-10</button>
+                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, +10)">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio SFX Test -->
+                <div class="host-card">
+                    <h6 class="fw-bold text-light opacity-75 mb-2">Sound Effects Preview</h6>
+                    <div class="btn-group btn-group-sm w-100">
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playDing")'>Ding 🔔</button>
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playStrike")'>Strike ❌</button>
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playBuzzer")'>Buzzer 🚨</button>
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playDuplicate")'>Duplicate Buzz ⚠️</button>
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playWin")'>Fanfare 🎺</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Custom Question Creator -->
-            <div class="host-card mt-3">
-                <h5 class="fw-bold text-light mb-2">➕ Add Single Custom Question</h5>
-                <div class="input-group mb-2">
-                    <input type="text" class="form-control bg-dark text-white border-secondary"
-                           placeholder="Type a custom survey question..." @bind="_customQuestionText" />
-                    <select class="form-select bg-dark text-white border-secondary" style="max-width: 120px;" @bind="_customMultiplier">
-                        <option value="1">1X Pts</option>
-                        <option value="2">2X Pts</option>
-                        <option value="3">3X Pts</option>
-                    </select>
+            <!-- RIGHT COLUMN: Questions & Answers Board -->
+            <div class="col-lg-7">
+                <div class="host-card border-info">
+                    <!-- Round navigation -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <button class="btn btn-outline-info btn-sm"
+                                disabled="@(GameState.CurrentRoundIndex == 0)"
+                                @onclick="() => GameState.PreviousRound()">
+                            ◀ Previous Round
+                        </button>
+                        <span class="fw-bold text-info fs-5">
+                            Round @(GameState.CurrentRoundIndex + 1) of @GameState.Questions.Count
+                            <span class="badge bg-warning text-dark ms-2">@(GameState.CurrentQuestion.Multiplier)X Points</span>
+                        </span>
+                        <button class="btn btn-outline-info btn-sm"
+                                disabled="@(GameState.CurrentRoundIndex + 1 >= GameState.Questions.Count)"
+                                @onclick="() => GameState.NextRound()">
+                            Next Round ▶
+                        </button>
+                    </div>
+
+                    <!-- Question Title -->
+                    <div class="p-3 bg-dark rounded border border-secondary mb-3">
+                        <div class="text-warning small fw-bold mb-1">SURVEY QUESTION:</div>
+                        <h5 class="fw-bold text-white mb-0">@GameState.CurrentQuestion.Text</h5>
+                    </div>
+
+                    <!-- Quick actions -->
+                    <div class="d-flex justify-content-end gap-2 mb-3">
+                        <button class="btn btn-sm btn-outline-light" @onclick="() => GameState.RevealAllAnswers()">
+                            Reveal All
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => GameState.HideAllAnswers()">
+                            Hide All
+                        </button>
+                    </div>
+
+                    <!-- Answers Table -->
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="text-secondary small">
+                                    <th style="width: 50px;">#</th>
+                                    <th>Answer</th>
+                                    <th style="width: 80px;" class="text-center">Points</th>
+                                    <th style="width: 120px;" class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var answer in GameState.CurrentQuestion.Answers)
+                                {
+                                    <tr class="@(answer.IsRevealed ? "table-active" : "")">
+                                        <td class="fw-bold text-warning">@answer.Id</td>
+                                        <td>
+                                            <span class="fw-bold @(answer.IsRevealed ? "text-success" : "text-light")">
+                                                @answer.Text
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-warning text-dark fw-bold fs-6">
+                                                @answer.Points
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm @(answer.IsRevealed ? "btn-secondary" : "btn-warning") fw-bold"
+                                                    @onclick="() => GameState.ToggleAnswer(answer.Id)">
+                                                @(answer.IsRevealed ? "Hide" : "Reveal")
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="text-secondary small mb-2">Add top answers (separated by commas with points, e.g. "Coffee: 40, Tea: 30, Soda: 15"):</div>
-                <div class="input-group mb-2">
-                    <input type="text" class="form-control bg-dark text-white border-secondary"
-                           placeholder="e.g. Pizza: 45, Burgers: 30, Tacos: 15" @bind="_customAnswersRaw" />
-                    <button class="btn btn-info fw-bold" @onclick="AddCustomQuestion">
-                        Add Round
-                    </button>
+
+                <!-- JSON Questions Import -->
+                <div class="host-card mt-3 border-secondary">
+                    <h5 class="fw-bold text-warning mb-2">📥 Import Questions Pack (JSON)</h5>
+                    <p class="text-secondary small mb-3">
+                        Import question sets with <code>Rounds</code>, <code>Question</code>, <code>Multiplier</code>, <code>Answers</code>, and <code>FastMoneyQuestions</code> (matching <code>SampleRounds.json</code>).
+                    </p>
+
+                    @if (!string.IsNullOrEmpty(_importSuccessMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show py-2 small mb-3">
+                            @_importSuccessMessage
+                            <button type="button" class="btn-close btn-close-white" @onclick="() => _importSuccessMessage = null"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(_importErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show py-2 small mb-3">
+                            @_importErrorMessage
+                            <button type="button" class="btn-close btn-close-white" @onclick="() => _importErrorMessage = null"></button>
+                        </div>
+                    }
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="replaceToggle" @bind="_replaceExistingOnImport" />
+                        <label class="form-check-label text-light small fw-bold" for="replaceToggle">
+                            Replace existing questions (unchecked = append as new rounds)
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold mb-1">Upload .JSON File:</label>
+                        <InputFile OnChange="HandleFileUpload" accept=".json" class="form-control form-control-sm bg-dark text-white border-secondary" />
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-sm btn-outline-warning fw-bold" @onclick="LoadSampleRoundsFile">
+                            📄 Load "SampleRounds.json" Pack
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" @onclick="() => _showPasteJson = !_showPasteJson">
+                            @(_showPasteJson ? "Hide Paste Area" : "📋 Paste Raw JSON")
+                        </button>
+                    </div>
+
+                    @if (_showPasteJson)
+                    {
+                        <div class="mt-3">
+                            <textarea class="form-control bg-dark text-white border-secondary font-monospace small mb-2"
+                                      rows="6" placeholder="Paste JSON array or { &quot;Rounds&quot;: [...], &quot;FastMoneyQuestions&quot;: [...] } here..." @bind="_pastedJsonText"></textarea>
+                            <button class="btn btn-sm btn-success fw-bold" @onclick="ImportPastedJson">
+                                Import Pasted JSON
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <!-- Custom Question Creator -->
+                <div class="host-card mt-3">
+                    <h5 class="fw-bold text-light mb-2">➕ Add Single Custom Question</h5>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                               placeholder="Type a custom survey question..." @bind="_customQuestionText" />
+                        <select class="form-select bg-dark text-white border-secondary" style="max-width: 120px;" @bind="_customMultiplier">
+                            <option value="1">1X Points</option>
+                            <option value="2">2X Points</option>
+                            <option value="3">3X Points</option>
+                        </select>
+                    </div>
+                    <div class="text-secondary small mb-2">Add top answers (separated by commas with points, e.g. "Coffee: 40, Tea: 30, Soda: 15"):</div>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                               placeholder="e.g. Pizza: 45, Burgers: 30, Tacos: 15" @bind="_customAnswersRaw" />
+                        <button class="btn btn-info fw-bold" @onclick="AddCustomQuestion">
+                            Add Round
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <!-- ==================== FAST MONEY HOST DESK ==================== -->
+        <div class="row g-4">
+            <!-- TOP BAR: Board Display Mode & Team Selector -->
+            <div class="col-12">
+                <div class="fm-host-card border-warning">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <span class="text-secondary small fw-bold d-block">TV AUDIENCE BOARD STATUS:</span>
+                            @if (GameState.FastMoney.IsActive)
+                            {
+                                <span class="badge bg-success fs-6">🟢 LIVE: Fast Money Board is showing on TV</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6">⚪ OFF: Main Game Board is showing on TV</span>
+                            }
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            @if (!GameState.FastMoney.IsActive)
+                            {
+                                <button class="btn btn-warning fw-bold" @onclick="() => GameState.SetFastMoneyActive(true)">
+                                    📺 Put Fast Money on TV Board
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-light fw-bold" @onclick="() => GameState.SetFastMoneyActive(false)">
+                                    ◀ Return TV Board to Main Game
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary my-3" />
+
+                    <!-- Winning Team Selection -->
+                    <div class="row align-items-center g-2">
+                        <div class="col-md-3">
+                            <span class="fw-bold text-warning">WINNING TEAM:</span>
+                        </div>
+                        <div class="col-md-9 d-flex gap-3">
+                            <button class="btn @(GameState.FastMoney.WinningTeamNumber == 1 ? "btn-danger fw-bold" : "btn-outline-danger")"
+                                    @onclick="() => GameState.SetFastMoneyWinningTeam(1)">
+                                Team 1: @GameState.Team1.Name
+                            </button>
+                            <button class="btn @(GameState.FastMoney.WinningTeamNumber == 2 ? "btn-primary fw-bold" : "btn-outline-primary")"
+                                    @onclick="() => GameState.SetFastMoneyWinningTeam(2)">
+                                Team 2: @GameState.Team2.Name
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEFT COLUMN: Timer & Player Control -->
+            <div class="col-lg-4">
+                <!-- Active Player & Clock Card -->
+                <div class="fm-host-card border-info">
+                    <h5 class="fw-bold text-info mb-3">⏱️ Clock & Turn Control</h5>
+
+                    <!-- Player Switcher -->
+                    <div class="btn-group w-100 mb-3">
+                        <button class="btn @(GameState.FastMoney.CurrentPlayer == 1 ? "btn-info text-dark fw-bold" : "btn-outline-secondary text-light")"
+                                @onclick="() => GameState.SetFastMoneyPlayer(1)">
+                            👤 Player 1 (20s)
+                        </button>
+                        <button class="btn @(GameState.FastMoney.CurrentPlayer == 2 ? "btn-info text-dark fw-bold" : "btn-outline-secondary text-light")"
+                                @onclick="() => GameState.SetFastMoneyPlayer(2)">
+                            👤 Player 2 (25s)
+                        </button>
+                    </div>
+
+                    <!-- Large Timer Display -->
+                    <div class="p-3 bg-dark rounded border text-center mb-3 @(GameState.FastMoney.IsTimerRunning ? "border-warning" : "border-secondary")">
+                        <div class="text-secondary small fw-bold">TIME REMAINING</div>
+                        <div class="display-3 fw-bold @(GameState.FastMoney.TimeRemaining <= 5 && GameState.FastMoney.TimeRemaining > 0 ? "text-danger" : "text-warning")">
+                            @GameState.FastMoney.TimeRemaining<span class="fs-4">s</span>
+                        </div>
+                        <div class="small text-muted">
+                            @(GameState.FastMoney.IsTimerRunning ? "⏳ COUNTDOWN RUNNING" : "⏸️ STOPPED")
+                        </div>
+                    </div>
+
+                    <!-- Timer Controls -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button class="btn @(GameState.FastMoney.IsTimerRunning ? "btn-danger" : "btn-success") fw-bold py-2 fs-5"
+                                @onclick="ToggleTimer">
+                            @(GameState.FastMoney.IsTimerRunning ? "⏸ Pause Timer" : "▶ Start Timer")
+                        </button>
+
+                        <div class="btn-group">
+                            <button class="btn btn-outline-light" @onclick="() => GameState.ResetFastMoneyTimer()">
+                                🔄 Reset (@(GameState.FastMoney.CurrentPlayer == 1 ? 20 : 25)s)
+                            </button>
+                            <button class="btn btn-outline-secondary" @onclick="() => GameState.AdjustFastMoneyTimer(-5)">-5s</button>
+                            <button class="btn btn-outline-secondary" @onclick="() => GameState.AdjustFastMoneyTimer(+5)">+5s</button>
+                        </div>
+                    </div>
+
+                    <!-- Duplicate Buzzer Trigger -->
+                    <div class="p-3 bg-danger bg-opacity-10 border border-danger rounded mb-3 text-center">
+                        <div class="text-danger small fw-bold mb-2">DUPLICATE ANSWER SOUND (PLAYER 2)</div>
+                        <button class="btn btn-danger w-100 fw-bold"
+                                @onclick='() => GameState.TriggerDuplicateBuzz()'>
+                            🚨 Duplicate Buzz ("Try Again!")
+                        </button>
+                    </div>
+
+                    <!-- Sound FX -->
+                    <div class="btn-group btn-group-sm w-100">
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playDing")'>🔔 Ding</button>
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playStrike")'>❌ Strike</button>
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playWin")'>🎺 Fanfare</button>
+                    </div>
+                </div>
+
+                <!-- Scoreboard Summary Card -->
+                <div class="fm-host-card border-success">
+                    <h5 class="fw-bold text-success mb-2">🏆 Grand Prize Tracker</h5>
+
+                    <div class="d-flex justify-content-between text-secondary small fw-bold mb-1">
+                        <span>P1: @GameState.FastMoney.Player1Total pts</span>
+                        <span>P2: @GameState.FastMoney.Player2Total pts</span>
+                    </div>
+
+                    <div class="p-3 bg-dark rounded border border-warning text-center mb-2">
+                        <div class="display-5 fw-bold text-warning">
+                            @GameState.FastMoney.CombinedRevealedTotal <span class="fs-4 text-secondary">/ 200</span>
+                        </div>
+                        <div class="text-light small">
+                            @(200 - GameState.FastMoney.CombinedRevealedTotal > 0 ? $"{200 - GameState.FastMoney.CombinedRevealedTotal} points needed to win grand prize" : "GRAND PRIZE ACHIEVED! 🎉")
+                        </div>
+                    </div>
+
+                    @if (GameState.FastMoney.HasWonGrandPrize)
+                    {
+                        <div class="alert alert-success text-center py-2 fw-bold mb-3">
+                            🎉 200+ POINTS! GRAND PRIZE WINNERS!
+                        </div>
+                    }
+
+                    <!-- Batch actions -->
+                    <div class="d-grid gap-2">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-info" @onclick="() => GameState.RevealAllFastMoney(1)">Reveal All P1</button>
+                            <button class="btn btn-outline-info" @onclick="() => GameState.RevealAllFastMoney(2)">Reveal All P2</button>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" @onclick="() => GameState.HideAllFastMoney(1)">Hide P1</button>
+                            <button class="btn btn-outline-secondary" @onclick="() => GameState.HideAllFastMoney(2)">Hide P2</button>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="() => GameState.ResetFastMoneyRound()">
+                            ⚠️ Reset Fast Money Round
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: 5 Fast Money Questions & Input Fields -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-warning mb-0">📝 5 Survey Questions & Live Recording</h5>
+                    <button class="btn btn-sm btn-outline-warning" @onclick="LoadSampleRoundsFile">
+                        📄 Reload Sample Fast Money Questions
+                    </button>
+                </div>
+
+                @for (int i = 0; i < Math.Min(5, GameState.FastMoney.Questions.Count); i++)
+                {
+                    var qIndex = i;
+                    var q = GameState.FastMoney.Questions[qIndex];
+                    var p1 = qIndex < GameState.FastMoney.Player1Answers.Count ? GameState.FastMoney.Player1Answers[qIndex] : null;
+                    var p2 = qIndex < GameState.FastMoney.Player2Answers.Count ? GameState.FastMoney.Player2Answers[qIndex] : null;
+
+                    <div class="fm-host-qcard">
+                        <!-- Question Header -->
+                        <div class="fm-host-qheader d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-warning text-dark fw-bold me-2">Q@(qIndex + 1)</span>
+                                <span class="fw-bold text-light">@q.Question</span>
+                            </div>
+                        </div>
+
+                        <!-- Top Survey Answers Quick-Pick Bar -->
+                        <div class="mb-3">
+                            <div class="text-secondary small mb-1">Click to auto-fill for currently active Player @(GameState.FastMoney.CurrentPlayer):</div>
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var ans in q.Answers)
+                                {
+                                    <button class="fm-quick-btn"
+                                            @onclick="() => QuickFillAnswer(qIndex, ans.Answer, ans.Points)">
+                                        @ans.Answer <strong class="text-warning">(@ans.Points)</strong>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Two Player Slots -->
+                        <div class="row g-2">
+                            <!-- Player 1 Slot -->
+                            <div class="col-md-6">
+                                <div class="p-2 bg-dark rounded border @(GameState.FastMoney.CurrentPlayer == 1 ? "border-info" : "border-secondary")">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold text-info">👤 Player 1</span>
+                                        <span class="badge @(p1 != null && p1.IsAnswerRevealed ? "bg-success" : "bg-secondary") small">
+                                            @(p1 != null && p1.IsAnswerRevealed ? "Answer Revealed" : "Hidden")
+                                        </span>
+                                    </div>
+
+                                    <div class="input-group input-group-sm mb-2">
+                                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                                               placeholder="Type answer..."
+                                               value="@(p1?.AnswerText ?? "")"
+                                               @onchange="(e) => OnP1AnswerChanged(qIndex, e.Value?.ToString())" />
+                                        <input type="number" class="form-control bg-dark text-white border-secondary text-center"
+                                               style="max-width: 65px;"
+                                               placeholder="Pts"
+                                               value="@(p1?.Points ?? 0)"
+                                               @onchange="(e) => OnP1PointsChanged(qIndex, e.Value?.ToString())" />
+                                    </div>
+
+                                    <div class="btn-group btn-group-sm w-100">
+                                        <button class="btn @(p1 != null && p1.IsAnswerRevealed ? "btn-secondary" : "btn-outline-info")"
+                                                @onclick="() => GameState.ToggleFastMoneyAnswerReveal(1, qIndex)">
+                                            @(p1 != null && p1.IsAnswerRevealed ? "Hide Answer" : "Reveal Answer")
+                                        </button>
+                                        <button class="btn @(p1 != null && p1.IsPointsRevealed ? "btn-warning text-dark fw-bold" : "btn-outline-warning")"
+                                                @onclick="() => GameState.ToggleFastMoneyPointsReveal(1, qIndex)">
+                                            @(p1 != null && p1.IsPointsRevealed ? "Hide Points" : "Reveal Points")
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Player 2 Slot -->
+                            <div class="col-md-6">
+                                <div class="p-2 bg-dark rounded border @(p2 != null && p2.IsDuplicate ? "border-danger" : GameState.FastMoney.CurrentPlayer == 2 ? "border-info" : "border-secondary")">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold text-info">👤 Player 2</span>
+                                        <span class="badge @(p2 != null && p2.IsAnswerRevealed ? "bg-success" : "bg-secondary") small">
+                                            @(p2 != null && p2.IsAnswerRevealed ? "Answer Revealed" : "Hidden")
+                                        </span>
+                                    </div>
+
+                                    @if (p2 != null && p2.IsDuplicate)
+                                    {
+                                        <div class="fm-duplicate-badge mb-1 w-100 text-center">
+                                            🚨 DUPLICATE! P1 also answered: "@p1?.AnswerText"!
+                                        </div>
+                                    }
+
+                                    <div class="input-group input-group-sm mb-2">
+                                        <input type="text" class="form-control bg-dark text-white border-secondary @(p2 != null && p2.IsDuplicate ? "border-danger text-danger fw-bold" : "")"
+                                               placeholder="Type answer..."
+                                               value="@(p2?.AnswerText ?? "")"
+                                               @onchange="(e) => OnP2AnswerChanged(qIndex, e.Value?.ToString())" />
+                                        <input type="number" class="form-control bg-dark text-white border-secondary text-center"
+                                               style="max-width: 65px;"
+                                               placeholder="Pts"
+                                               value="@(p2?.Points ?? 0)"
+                                               @onchange="(e) => OnP2PointsChanged(qIndex, e.Value?.ToString())" />
+                                    </div>
+
+                                    <div class="btn-group btn-group-sm w-100">
+                                        <button class="btn @(p2 != null && p2.IsAnswerRevealed ? "btn-secondary" : "btn-outline-info")"
+                                                @onclick="() => GameState.ToggleFastMoneyAnswerReveal(2, qIndex)">
+                                            @(p2 != null && p2.IsAnswerRevealed ? "Hide Answer" : "Reveal Answer")
+                                        </button>
+                                        <button class="btn @(p2 != null && p2.IsPointsRevealed ? "btn-warning text-dark fw-bold" : "btn-outline-warning")"
+                                                @onclick="() => GameState.ToggleFastMoneyPointsReveal(2, qIndex)">
+                                            @(p2 != null && p2.IsPointsRevealed ? "Hide Points" : "Reveal Points")
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>
 
 @code {
+    private bool _isFastMoneyTab = false;
     private string _customQuestionText = string.Empty;
     private int _customMultiplier = 1;
     private string _customAnswersRaw = string.Empty;
@@ -320,6 +633,56 @@
     private async void HandleStateChanged()
     {
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleTimer()
+    {
+        if (GameState.FastMoney.IsTimerRunning)
+        {
+            GameState.StopFastMoneyTimer();
+        }
+        else
+        {
+            GameState.StartFastMoneyTimer();
+        }
+    }
+
+    private void QuickFillAnswer(int qIndex, string answerText, int points)
+    {
+        int player = GameState.FastMoney.CurrentPlayer;
+        GameState.SetFastMoneyAnswer(player, qIndex, answerText, points);
+    }
+
+    private void OnP1AnswerChanged(int qIndex, string? val)
+    {
+        string text = val ?? string.Empty;
+        int pts = GameState.FindFastMoneyPoints(qIndex, text);
+        GameState.SetFastMoneyAnswer(1, qIndex, text, pts);
+    }
+
+    private void OnP1PointsChanged(int qIndex, string? val)
+    {
+        if (int.TryParse(val, out int pts))
+        {
+            var p1 = qIndex < GameState.FastMoney.Player1Answers.Count ? GameState.FastMoney.Player1Answers[qIndex] : null;
+            GameState.SetFastMoneyAnswer(1, qIndex, p1?.AnswerText ?? string.Empty, pts);
+        }
+    }
+
+    private void OnP2AnswerChanged(int qIndex, string? val)
+    {
+        string text = val ?? string.Empty;
+        int pts = GameState.FindFastMoneyPoints(qIndex, text);
+        GameState.SetFastMoneyAnswer(2, qIndex, text, pts);
+    }
+
+    private void OnP2PointsChanged(int qIndex, string? val)
+    {
+        if (int.TryParse(val, out int pts))
+        {
+            var p2 = qIndex < GameState.FastMoney.Player2Answers.Count ? GameState.FastMoney.Player2Answers[qIndex] : null;
+            GameState.SetFastMoneyAnswer(2, qIndex, p2?.AnswerText ?? string.Empty, pts);
+        }
     }
 
     private void ConfirmResetGame()
@@ -344,7 +707,7 @@
             int count = GameState.ImportQuestionsFromJson(json, _replaceExistingOnImport);
             if (count > 0)
             {
-                _importSuccessMessage = $"Successfully imported {count} rounds from '{file.Name}'!";
+                _importSuccessMessage = $"Successfully imported {count} items from '{file.Name}'!";
             }
             else
             {
@@ -382,7 +745,7 @@
             int count = GameState.ImportQuestionsFromJson(json, _replaceExistingOnImport);
             if (count > 0)
             {
-                _importSuccessMessage = $"Successfully imported {count} rounds from SampleRounds.json!";
+                _importSuccessMessage = $"Successfully imported {count} items from SampleRounds.json!";
             }
             else
             {
@@ -411,7 +774,7 @@
             int count = GameState.ImportQuestionsFromJson(_pastedJsonText, _replaceExistingOnImport);
             if (count > 0)
             {
-                _importSuccessMessage = $"Successfully imported {count} rounds from pasted JSON!";
+                _importSuccessMessage = $"Successfully imported {count} items from pasted JSON!";
                 _pastedJsonText = string.Empty;
                 _showPasteJson = false;
             }

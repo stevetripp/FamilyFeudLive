@@ -12,17 +12,17 @@ An interactive, real-time Family Feud game show web application built with ASP.N
 ### Key Directories & Files
 
 - **`Components/Pages/`**:
-  - `Board.razor` (`/board`): Audience display board displaying questions, concealed/revealed answers, team scores, strikes, and sound effects.
-  - `Host.razor` (`/host`): Admin and game controller view to advance rounds, reveal answers, award points, trigger strikes, and import questions.
+  - `Board.razor` (`/board`): Audience display board displaying questions, concealed/revealed answers, team scores, strikes, Fast Money dual-column board with timers, and sound effects.
+  - `Host.razor` (`/host`): Admin and game controller view to manage main game rounds and Fast Money (clock, answer recording, duplicate detection, and reveal controls).
   - `Buzzer.razor` (`/buzzer`): Mobile buzzer client for players to buzz in first.
   - `Home.razor` (`/`): Landing page featuring QR codes and direct links to the board, host, and buzzer screens.
 - **`Services/`**:
-  - `GameStateService.cs`: Central singleton holding current game state (teams, scores, current round/question, strikes, buzzer state, sound event IDs). Coordinates real-time updates via `OnChange` action events.
+  - `GameStateService.cs`: Central singleton holding game state (teams, scores, current round/question, strikes, buzzer state, Fast Money state with countdown timers & duplicate answer handling, sound event IDs). Coordinates real-time updates via `OnChange` action events.
   - `QrCodeService.cs`: Generates QR codes (PNG data URLs / SVGs) using `QRCoder` to simplify mobile connection.
 - **`Models/`**:
-  - `GameModels.cs`: Core data models including `Question`, `AnswerItem`, `Team`, `BuzzerState`, and JSON import structures.
+  - `GameModels.cs`: Core data models including `Question`, `AnswerItem`, `Team`, `BuzzerState`, `FastMoneyQuestion`, `FastMoneyState`, and JSON import structures.
 - **`SampleRounds.json`**:
-  - Default and sample round question sets ready to be imported through the Host dashboard.
+  - Default and sample round question sets and Fast Money questions ready to be imported through the Host dashboard.
 
 ---
 

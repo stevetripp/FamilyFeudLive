@@ -20,6 +20,11 @@ public class GameStateService
     public long LastBuzzerEventId { get; private set; }
     public long LastDingEventId { get; private set; }
     public long LastStrikeEventId { get; private set; }
+    public long LastDuplicateEventId { get; private set; }
+    public long LastWinEventId { get; private set; }
+
+    public FastMoneyState FastMoney { get; set; } = new();
+    private CancellationTokenSource? _fastMoneyTimerCts;
 
     public event Action? OnChange;
 
@@ -63,6 +68,99 @@ public class GameStateService
     public GameStateService()
     {
         LoadDefaultQuestions();
+        LoadDefaultFastMoneyQuestions();
+    }
+
+    public void InitFastMoneyPlayerSlots()
+    {
+        FastMoney.Player1Answers.Clear();
+        FastMoney.Player2Answers.Clear();
+        int count = Math.Max(5, FastMoney.Questions.Count);
+        for (int i = 0; i < count; i++)
+        {
+            FastMoney.Player1Answers.Add(new FastMoneyPlayerAnswer { QuestionIndex = i });
+            FastMoney.Player2Answers.Add(new FastMoneyPlayerAnswer { QuestionIndex = i });
+        }
+    }
+
+    private void LoadDefaultFastMoneyQuestions()
+    {
+        FastMoney.Questions = new List<FastMoneyQuestion>
+        {
+            new()
+            {
+                QuestionId = 1,
+                Question = "Name a fruit you might put in a smoothie.",
+                Answers = new List<FastMoneyAnswer>
+                {
+                    new() { Answer = "Banana", Points = 42 },
+                    new() { Answer = "Strawberry", Points = 28 },
+                    new() { Answer = "Mango", Points = 12 },
+                    new() { Answer = "Blueberry", Points = 8 },
+                    new() { Answer = "Peach", Points = 5 },
+                    new() { Answer = "Pineapple", Points = 3 },
+                    new() { Answer = "Raspberry", Points = 2 }
+                }
+            },
+            new()
+            {
+                QuestionId = 2,
+                Question = "Name something people bring to the beach.",
+                Answers = new List<FastMoneyAnswer>
+                {
+                    new() { Answer = "Towel", Points = 38 },
+                    new() { Answer = "Sunscreen", Points = 25 },
+                    new() { Answer = "Umbrella", Points = 15 },
+                    new() { Answer = "Cooler / Drinks", Points = 10 },
+                    new() { Answer = "Chair", Points = 8 },
+                    new() { Answer = "Sunglasses", Points = 4 }
+                }
+            },
+            new()
+            {
+                QuestionId = 3,
+                Question = "Name a popular pizza topping.",
+                Answers = new List<FastMoneyAnswer>
+                {
+                    new() { Answer = "Pepperoni", Points = 48 },
+                    new() { Answer = "Sausage", Points = 21 },
+                    new() { Answer = "Mushrooms", Points = 14 },
+                    new() { Answer = "Extra Cheese", Points = 9 },
+                    new() { Answer = "Onions", Points = 5 },
+                    new() { Answer = "Bacon", Points = 3 }
+                }
+            },
+            new()
+            {
+                QuestionId = 4,
+                Question = "Name something you do first thing in the morning.",
+                Answers = new List<FastMoneyAnswer>
+                {
+                    new() { Answer = "Brush teeth", Points = 39 },
+                    new() { Answer = "Stretch / Yawn", Points = 22 },
+                    new() { Answer = "Check phone", Points = 18 },
+                    new() { Answer = "Drink coffee / water", Points = 12 },
+                    new() { Answer = "Use the bathroom", Points = 6 },
+                    new() { Answer = "Turn off alarm", Points = 3 }
+                }
+            },
+            new()
+            {
+                QuestionId = 5,
+                Question = "Name a reason people give for being pulled over by the police.",
+                Answers = new List<FastMoneyAnswer>
+                {
+                    new() { Answer = "Speeding", Points = 61 },
+                    new() { Answer = "Broken taillight", Points = 16 },
+                    new() { Answer = "Running a red light", Points = 11 },
+                    new() { Answer = "Expired tags / registration", Points = 6 },
+                    new() { Answer = "Texting while driving", Points = 4 },
+                    new() { Answer = "Failure to signal", Points = 2 }
+                }
+            }
+        };
+
+        InitFastMoneyPlayerSlots();
     }
 
     private void LoadDefaultQuestions()
@@ -159,8 +257,9 @@ public class GameStateService
             };
 
             List<JsonImportQuestion>? imported = null;
+            List<FastMoneyQuestion>? fastMoneyImported = null;
 
-            // 1. Try root object with "Rounds" or "Questions" array: { "Rounds": [ ... ] }
+            // 1. Try root object with "Rounds" / "Questions" / "FastMoneyQuestions"
             try
             {
                 var root = JsonSerializer.Deserialize<JsonImportRoot>(json, options);
@@ -171,6 +270,15 @@ public class GameStateService
                 else if (root?.Questions != null && root.Questions.Count > 0)
                 {
                     imported = root.Questions;
+                }
+
+                if (root?.FastMoneyQuestions != null && root.FastMoneyQuestions.Count > 0)
+                {
+                    fastMoneyImported = root.FastMoneyQuestions;
+                }
+                else if (root?.FastMoneyQuestion != null && root.FastMoneyQuestion.Count > 0)
+                {
+                    fastMoneyImported = root.FastMoneyQuestion;
                 }
             }
             catch
@@ -191,70 +299,100 @@ public class GameStateService
                 }
             }
 
-            if (imported == null || imported.Count == 0)
+            // 3. If still nothing, check if top-level array is List<FastMoneyQuestion>
+            if ((imported == null || imported.Count == 0) && (fastMoneyImported == null || fastMoneyImported.Count == 0))
             {
-                return 0;
-            }
-
-            if (replaceExisting)
-            {
-                Questions.Clear();
-                CurrentRoundIndex = 0;
-                Strikes = 0;
-                ResetBuzzer();
-            }
-
-            int startId = Questions.Count > 0 ? Questions.Max(q => q.Id) + 1 : 1;
-            int addedCount = 0;
-
-            foreach (var item in imported)
-            {
-                var qText = !string.IsNullOrWhiteSpace(item.Question) ? item.Question : item.Text;
-                if (string.IsNullOrWhiteSpace(qText)) continue;
-
-                int totalRoundsBefore = Questions.Count;
-                int defaultMultiplier = totalRoundsBefore < 2 ? 1 : (totalRoundsBefore < 4 ? 2 : 3);
-                int multiplier = item.Multiplier > 0 ? item.Multiplier : defaultMultiplier;
-
-                var question = new Question
+                try
                 {
-                    Id = startId++,
-                    Text = qText.Trim(),
-                    Multiplier = multiplier,
-                    Answers = new List<AnswerItem>()
-                };
-
-                if (item.Answers != null)
-                {
-                    // Order answers from highest rank (#1) to lowest rank by points
-                    var validAnswers = item.Answers
-                        .Where(a => !string.IsNullOrWhiteSpace(a.Answer) || !string.IsNullOrWhiteSpace(a.Text))
-                        .OrderByDescending(a => a.Points > 0 ? a.Points : (a.PeopleWithAnswer > 0 ? a.PeopleWithAnswer : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10)))
-                        .ToList();
-
-                    int answerId = 1;
-                    foreach (var a in validAnswers)
+                    var fmq = JsonSerializer.Deserialize<List<FastMoneyQuestion>>(json, options);
+                    if (fmq != null && fmq.Any(q => q.Answers.Count > 0))
                     {
-                        var aText = !string.IsNullOrWhiteSpace(a.Answer) ? a.Answer : a.Text;
-                        int points = a.Points > 0
-                            ? a.Points
-                            : (a.PeopleWithAnswer > 0 ? a.PeopleWithAnswer : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10));
-
-                        question.Answers.Add(new AnswerItem
-                        {
-                            Id = answerId++,
-                            Text = aText!.Trim(),
-                            Points = points,
-                            IsRevealed = false
-                        });
+                        fastMoneyImported = fmq;
                     }
                 }
-
-                Questions.Add(question);
-                addedCount++;
+                catch
+                {
+                    // ignore
+                }
             }
 
-            NotifyStateChanged();
+            int addedCount = 0;
+
+            if (fastMoneyImported != null && fastMoneyImported.Count > 0)
+            {
+                foreach (var fmq in fastMoneyImported)
+                {
+                    fmq.Answers = fmq.Answers.OrderByDescending(a => a.Points).ToList();
+                }
+                FastMoney.Questions = fastMoneyImported;
+                InitFastMoneyPlayerSlots();
+                addedCount += fastMoneyImported.Count;
+            }
+
+            if (imported != null && imported.Count > 0)
+            {
+                if (replaceExisting)
+                {
+                    Questions.Clear();
+                    CurrentRoundIndex = 0;
+                    Strikes = 0;
+                    ResetBuzzer();
+                }
+
+                int startId = Questions.Count > 0 ? Questions.Max(q => q.Id) + 1 : 1;
+
+                foreach (var item in imported)
+                {
+                    var qText = !string.IsNullOrWhiteSpace(item.Question) ? item.Question : item.Text;
+                    if (string.IsNullOrWhiteSpace(qText)) continue;
+
+                    int totalRoundsBefore = Questions.Count;
+                    int defaultMultiplier = totalRoundsBefore < 2 ? 1 : (totalRoundsBefore < 4 ? 2 : 3);
+                    int multiplier = item.Multiplier > 0 ? item.Multiplier : defaultMultiplier;
+
+                    var question = new Question
+                    {
+                        Id = startId++,
+                        Text = qText.Trim(),
+                        Multiplier = multiplier,
+                        Answers = new List<AnswerItem>()
+                    };
+
+                    if (item.Answers != null)
+                    {
+                        // Order answers from highest rank (#1) to lowest rank by points
+                        var validAnswers = item.Answers
+                            .Where(a => !string.IsNullOrWhiteSpace(a.Answer) || !string.IsNullOrWhiteSpace(a.Text))
+                            .OrderByDescending(a => a.Points > 0 ? a.Points : (a.PeopleWithAnswer > 0 ? a.PeopleWithAnswer : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10)))
+                            .ToList();
+
+                        int answerId = 1;
+                        foreach (var a in validAnswers)
+                        {
+                            var aText = !string.IsNullOrWhiteSpace(a.Answer) ? a.Answer : a.Text;
+                            int points = a.Points > 0
+                                ? a.Points
+                                : (a.PeopleWithAnswer > 0 ? a.PeopleWithAnswer : (item.PointsPerAnswer > 0 ? item.PointsPerAnswer : 10));
+
+                            question.Answers.Add(new AnswerItem
+                            {
+                                Id = answerId++,
+                                Text = aText!.Trim(),
+                                Points = points,
+                                IsRevealed = false
+                            });
+                        }
+                    }
+
+                    Questions.Add(question);
+                    addedCount++;
+                }
+            }
+
+            if (addedCount > 0)
+            {
+                NotifyStateChanged();
+            }
             return addedCount;
         }
     }
@@ -475,6 +613,299 @@ public class GameStateService
             Team2.Name = team2Name;
             NotifyStateChanged();
         }
+    }
+
+    // FAST MONEY METHODS
+    public void SetFastMoneyActive(bool active)
+    {
+        lock (_lock)
+        {
+            FastMoney.IsActive = active;
+            if (active)
+            {
+                FastMoney.WinningTeamNumber = Team2.Score > Team1.Score ? 2 : 1;
+                FastMoney.WinningTeamName = FastMoney.WinningTeamNumber == 1 ? Team1.Name : Team2.Name;
+                if (FastMoney.Questions.Count == 0)
+                {
+                    LoadDefaultFastMoneyQuestions();
+                }
+            }
+            NotifyStateChanged();
+        }
+    }
+
+    public void SetFastMoneyWinningTeam(int teamNumber)
+    {
+        lock (_lock)
+        {
+            FastMoney.WinningTeamNumber = teamNumber;
+            FastMoney.WinningTeamName = teamNumber == 1 ? Team1.Name : Team2.Name;
+            NotifyStateChanged();
+        }
+    }
+
+    public void SetFastMoneyPlayer(int playerNumber)
+    {
+        lock (_lock)
+        {
+            FastMoney.CurrentPlayer = playerNumber;
+            StopFastMoneyTimer();
+            FastMoney.TimeRemaining = playerNumber == 1 ? 20 : 25;
+            FastMoney.DuplicateWarningMessage = null;
+            NotifyStateChanged();
+        }
+    }
+
+    public void StartFastMoneyTimer()
+    {
+        lock (_lock)
+        {
+            if (FastMoney.IsTimerRunning) return;
+            FastMoney.IsTimerRunning = true;
+            _fastMoneyTimerCts?.Cancel();
+            _fastMoneyTimerCts = new CancellationTokenSource();
+            var token = _fastMoneyTimerCts.Token;
+
+            _ = Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await Task.Delay(1000, token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+
+                    lock (_lock)
+                    {
+                        if (!FastMoney.IsTimerRunning || token.IsCancellationRequested) break;
+
+                        if (FastMoney.TimeRemaining > 0)
+                        {
+                            FastMoney.TimeRemaining--;
+                            NotifyStateChanged();
+
+                            if (FastMoney.TimeRemaining == 0)
+                            {
+                                FastMoney.IsTimerRunning = false;
+                                LastBuzzerEventId = DateTime.UtcNow.Ticks;
+                                NotifyStateChanged();
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            FastMoney.IsTimerRunning = false;
+                            NotifyStateChanged();
+                            break;
+                        }
+                    }
+                }
+            }, token);
+
+            NotifyStateChanged();
+        }
+    }
+
+    public void StopFastMoneyTimer()
+    {
+        lock (_lock)
+        {
+            FastMoney.IsTimerRunning = false;
+            _fastMoneyTimerCts?.Cancel();
+            NotifyStateChanged();
+        }
+    }
+
+    public void ResetFastMoneyTimer(int? seconds = null)
+    {
+        lock (_lock)
+        {
+            StopFastMoneyTimer();
+            FastMoney.TimeRemaining = seconds ?? (FastMoney.CurrentPlayer == 1 ? 20 : 25);
+            NotifyStateChanged();
+        }
+    }
+
+    public void AdjustFastMoneyTimer(int delta)
+    {
+        lock (_lock)
+        {
+            FastMoney.TimeRemaining = Math.Max(0, FastMoney.TimeRemaining + delta);
+            NotifyStateChanged();
+        }
+    }
+
+    public void SetFastMoneyAnswer(int playerNumber, int questionIndex, string answerText, int points)
+    {
+        lock (_lock)
+        {
+            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            if (questionIndex >= 0 && questionIndex < list.Count)
+            {
+                var slot = list[questionIndex];
+                slot.AnswerText = answerText?.Trim() ?? string.Empty;
+                slot.Points = points;
+
+                if (playerNumber == 2)
+                {
+                    var p1Answer = questionIndex < FastMoney.Player1Answers.Count
+                        ? FastMoney.Player1Answers[questionIndex].AnswerText
+                        : string.Empty;
+
+                    bool isDuplicate = !string.IsNullOrWhiteSpace(slot.AnswerText) &&
+                                       !string.IsNullOrWhiteSpace(p1Answer) &&
+                                       string.Equals(slot.AnswerText, p1Answer, StringComparison.OrdinalIgnoreCase);
+
+                    slot.IsDuplicate = isDuplicate;
+                    if (isDuplicate)
+                    {
+                        LastDuplicateEventId = DateTime.UtcNow.Ticks;
+                        FastMoney.DuplicateWarningMessage = $"DUPLICATE ANSWER: \"{slot.AnswerText.ToUpper()}\"! TRY AGAIN!";
+                        FastMoney.DuplicateAlertTimestamp = DateTime.UtcNow.Ticks;
+                    }
+                    else
+                    {
+                        FastMoney.DuplicateWarningMessage = null;
+                    }
+                }
+
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public void TriggerDuplicateBuzz(string? customMsg = null)
+    {
+        lock (_lock)
+        {
+            LastDuplicateEventId = DateTime.UtcNow.Ticks;
+            FastMoney.DuplicateWarningMessage = customMsg ?? "DUPLICATE ANSWER! TRY AGAIN!";
+            FastMoney.DuplicateAlertTimestamp = DateTime.UtcNow.Ticks;
+            NotifyStateChanged();
+        }
+    }
+
+    public void ClearDuplicateWarning()
+    {
+        lock (_lock)
+        {
+            FastMoney.DuplicateWarningMessage = null;
+            NotifyStateChanged();
+        }
+    }
+
+    public void ToggleFastMoneyAnswerReveal(int playerNumber, int questionIndex)
+    {
+        lock (_lock)
+        {
+            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            if (questionIndex >= 0 && questionIndex < list.Count)
+            {
+                list[questionIndex].IsAnswerRevealed = !list[questionIndex].IsAnswerRevealed;
+                if (list[questionIndex].IsAnswerRevealed)
+                {
+                    LastDingEventId = DateTime.UtcNow.Ticks;
+                }
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public void ToggleFastMoneyPointsReveal(int playerNumber, int questionIndex)
+    {
+        lock (_lock)
+        {
+            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            if (questionIndex >= 0 && questionIndex < list.Count)
+            {
+                list[questionIndex].IsPointsRevealed = !list[questionIndex].IsPointsRevealed;
+                if (list[questionIndex].IsPointsRevealed)
+                {
+                    LastDingEventId = DateTime.UtcNow.Ticks;
+                    if (FastMoney.HasWonGrandPrize)
+                    {
+                        LastWinEventId = DateTime.UtcNow.Ticks;
+                    }
+                }
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public void RevealAllFastMoney(int playerNumber)
+    {
+        lock (_lock)
+        {
+            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            foreach (var slot in list)
+            {
+                slot.IsAnswerRevealed = true;
+                slot.IsPointsRevealed = true;
+            }
+            LastDingEventId = DateTime.UtcNow.Ticks;
+            if (FastMoney.HasWonGrandPrize)
+            {
+                LastWinEventId = DateTime.UtcNow.Ticks;
+            }
+            NotifyStateChanged();
+        }
+    }
+
+    public void HideAllFastMoney(int playerNumber)
+    {
+        lock (_lock)
+        {
+            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            foreach (var slot in list)
+            {
+                slot.IsAnswerRevealed = false;
+                slot.IsPointsRevealed = false;
+            }
+            NotifyStateChanged();
+        }
+    }
+
+    public void ResetFastMoneyRound()
+    {
+        lock (_lock)
+        {
+            StopFastMoneyTimer();
+            FastMoney.CurrentPlayer = 1;
+            FastMoney.TimeRemaining = 20;
+            FastMoney.DuplicateWarningMessage = null;
+            InitFastMoneyPlayerSlots();
+            NotifyStateChanged();
+        }
+    }
+
+    public int FindFastMoneyPoints(int questionIndex, string answerText)
+    {
+        if (questionIndex < 0 || questionIndex >= FastMoney.Questions.Count || string.IsNullOrWhiteSpace(answerText))
+            return 0;
+
+        var q = FastMoney.Questions[questionIndex];
+        var clean = answerText.Trim();
+
+        var exact = q.Answers.FirstOrDefault(a =>
+            string.Equals(a.Answer, clean, StringComparison.OrdinalIgnoreCase) ||
+            (!string.IsNullOrWhiteSpace(a.Text) && string.Equals(a.Text, clean, StringComparison.OrdinalIgnoreCase)));
+        if (exact != null) return exact.Points;
+
+        var partial = q.Answers.FirstOrDefault(a =>
+        {
+            var text = !string.IsNullOrWhiteSpace(a.Answer) ? a.Answer : a.Text;
+            if (string.IsNullOrEmpty(text)) return false;
+            var parts = text.Split(new[] { '/', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            return parts.Any(p => string.Equals(p.Trim(), clean, StringComparison.OrdinalIgnoreCase)) ||
+                   text.Contains(clean, StringComparison.OrdinalIgnoreCase) ||
+                   clean.Contains(text, StringComparison.OrdinalIgnoreCase);
+        });
+
+        return partial?.Points ?? 0;
     }
 
     private void NotifyStateChanged() => OnChange?.Invoke();

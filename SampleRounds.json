@@ -130,5 +130,68 @@
         }
       ]
     }
+  ],
+  "FastMoneyQuestions": [
+    {
+      "QuestionId": 1,
+      "Question": "Name a fruit you might put in a smoothie.",
+      "Answers": [
+        { "Answer": "Banana", "Points": 42 },
+        { "Answer": "Strawberry", "Points": 28 },
+        { "Answer": "Mango", "Points": 12 },
+        { "Answer": "Blueberry", "Points": 8 },
+        { "Answer": "Peach", "Points": 5 },
+        { "Answer": "Pineapple", "Points": 3 },
+        { "Answer": "Raspberry", "Points": 2 }
+      ]
+    },
+    {
+      "QuestionId": 2,
+      "Question": "Name something people bring to the beach.",
+      "Answers": [
+        { "Answer": "Towel", "Points": 38 },
+        { "Answer": "Sunscreen", "Points": 25 },
+        { "Answer": "Umbrella", "Points": 15 },
+        { "Answer": "Cooler / Drinks", "Points": 10 },
+        { "Answer": "Chair", "Points": 8 },
+        { "Answer": "Sunglasses", "Points": 4 }
+      ]
+    },
+    {
+      "QuestionId": 3,
+      "Question": "Name a popular pizza topping.",
+      "Answers": [
+        { "Answer": "Pepperoni", "Points": 48 },
+        { "Answer": "Sausage", "Points": 21 },
+        { "Answer": "Mushrooms", "Points": 14 },
+        { "Answer": "Extra Cheese", "Points": 9 },
+        { "Answer": "Onions", "Points": 5 },
+        { "Answer": "Bacon", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 4,
+      "Question": "Name something you do first thing in the morning.",
+      "Answers": [
+        { "Answer": "Brush teeth", "Points": 39 },
+        { "Answer": "Stretch / Yawn", "Points": 22 },
+        { "Answer": "Check phone", "Points": 18 },
+        { "Answer": "Drink coffee / water", "Points": 12 },
+        { "Answer": "Use the bathroom", "Points": 6 },
+        { "Answer": "Turn off alarm", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 5,
+      "Question": "Name a reason people give for being pulled over by the police.",
+      "Answers": [
+        { "Answer": "Speeding", "Points": 61 },
+        { "Answer": "Broken taillight", "Points": 16 },
+        { "Answer": "Running a red light", "Points": 11 },
+        { "Answer": "Expired tags / registration", "Points": 6 },
+        { "Answer": "Texting while driving", "Points": 4 },
+        { "Answer": "Failure to signal", "Points": 2 }
+      ]
+    }
   ]
 }

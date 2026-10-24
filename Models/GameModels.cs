@@ -53,4 +53,51 @@ public class JsonImportRoot
 {
     public List<JsonImportQuestion>? Rounds { get; set; }
     public List<JsonImportQuestion>? Questions { get; set; }
+    public List<FastMoneyQuestion>? FastMoneyQuestions { get; set; }
+    public List<FastMoneyQuestion>? FastMoneyQuestion { get; set; }
+}
+
+public class FastMoneyAnswer
+{
+    public string Answer { get; set; } = string.Empty;
+    public string? Text { get; set; }
+    public int Points { get; set; }
+}
+
+public class FastMoneyQuestion
+{
+    public int QuestionId { get; set; }
+    public string Question { get; set; } = string.Empty;
+    public string? Text { get; set; }
+    public List<FastMoneyAnswer> Answers { get; set; } = new();
+}
+
+public class FastMoneyPlayerAnswer
+{
+    public int QuestionIndex { get; set; }
+    public string AnswerText { get; set; } = string.Empty;
+    public int Points { get; set; }
+    public bool IsAnswerRevealed { get; set; }
+    public bool IsPointsRevealed { get; set; }
+    public bool IsDuplicate { get; set; }
+}
+
+public class FastMoneyState
+{
+    public bool IsActive { get; set; }
+    public int WinningTeamNumber { get; set; } = 1;
+    public string WinningTeamName { get; set; } = string.Empty;
+    public int CurrentPlayer { get; set; } = 1;
+    public int TimeRemaining { get; set; } = 20;
+    public bool IsTimerRunning { get; set; }
+    public List<FastMoneyQuestion> Questions { get; set; } = new();
+    public List<FastMoneyPlayerAnswer> Player1Answers { get; set; } = new();
+    public List<FastMoneyPlayerAnswer> Player2Answers { get; set; } = new();
+    public string? DuplicateWarningMessage { get; set; }
+    public long DuplicateAlertTimestamp { get; set; }
+
+    public int Player1Total => Player1Answers.Where(a => a.IsPointsRevealed).Sum(a => a.Points);
+    public int Player2Total => Player2Answers.Where(a => a.IsPointsRevealed).Sum(a => a.Points);
+    public int CombinedRevealedTotal => Player1Total + Player2Total;
+    public bool HasWonGrandPrize => CombinedRevealedTotal >= 200;
 }

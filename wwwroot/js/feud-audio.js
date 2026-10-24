@@ -106,6 +106,16 @@ class FeudAudio {
         osc.stop(now + 0.5);
     }
 
+    // Duplicate Answer Buzzer (Short double buzz: "BUZZ-BUZZ!")
+    playDuplicate() {
+        this.init();
+        if (!this.ctx) return;
+        this.playStrike();
+        setTimeout(() => {
+            this.playStrike();
+        }, 240);
+    }
+
     // Win Fanfare
     playWin() {
         this.init();
