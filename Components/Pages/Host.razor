@@ -302,8 +302,14 @@
                     </div>
 
                     <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-sm btn-outline-warning fw-bold" @onclick="LoadSampleRoundsFile">
-                            📄 Load "SampleRounds.json" Pack
+                        <button class="btn btn-sm btn-outline-warning fw-bold" @onclick='() => LoadPackFile("SampleRounds.json")'>
+                            📄 Load SampleRounds.json
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning fw-bold" @onclick='() => LoadPackFile("HalloweenGame1.json")'>
+                            🎃 Load Halloween Game 1
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning fw-bold" @onclick='() => LoadPackFile("HalloweenGame2.json")'>
+                            🎃 Load Halloween Game 2
                         </button>
                         <button class="btn btn-sm btn-outline-info" @onclick="() => _showPasteJson = !_showPasteJson">
                             @(_showPasteJson ? "Hide Paste Area" : "📋 Paste Raw JSON")
@@ -731,7 +737,9 @@
         }
     }
 
-    private void LoadSampleRoundsFile()
+    private void LoadSampleRoundsFile() => LoadPackFile("SampleRounds.json");
+
+    private void LoadPackFile(string fileName)
     {
         _importSuccessMessage = null;
         _importErrorMessage = null;
@@ -740,15 +748,15 @@
         {
             var searchPaths = new[]
             {
-                Path.Combine(AppContext.BaseDirectory, "SampleRounds.json"),
-                Path.Combine(Directory.GetCurrentDirectory(), "SampleRounds.json"),
-                @"D:\Src\FamilyFeudLive\SampleRounds.json"
+                Path.Combine(AppContext.BaseDirectory, fileName),
+                Path.Combine(Directory.GetCurrentDirectory(), fileName),
+                Path.Combine(@"D:\Src\FamilyFeudLive", fileName)
             };
 
             var path = searchPaths.FirstOrDefault(File.Exists);
             if (path == null)
             {
-                _importErrorMessage = "Could not find 'SampleRounds.json' on the server.";
+                _importErrorMessage = $"Could not find '{fileName}' on the server.";
                 return;
             }
 
@@ -756,16 +764,16 @@
             int count = GameState.ImportQuestionsFromJson(json, _replaceExistingOnImport);
             if (count > 0)
             {
-                _importSuccessMessage = $"Successfully imported {count} items from SampleRounds.json!";
+                _importSuccessMessage = $"Successfully imported {count} items from {fileName}!";
             }
             else
             {
-                _importErrorMessage = "No valid questions were found in SampleRounds.json.";
+                _importErrorMessage = $"No valid questions were found in {fileName}.";
             }
         }
         catch (Exception ex)
         {
-            _importErrorMessage = $"Error loading SampleRounds.json: {ex.Message}";
+            _importErrorMessage = $"Error loading {fileName}: {ex.Message}";
         }
     }
 

@@ -1,0 +1,215 @@
+{
+  "Rounds": [
+    {
+      "Multiplier": 1,
+      "Question": "Name a famous monster you might see in a classic horror movie.",
+      "Answers": [
+        {
+          "Answer": "Dracula / Vampire",
+          "Points": 37
+        },
+        {
+          "Answer": "Frankenstein's Monster",
+          "Points": 26
+        },
+        {
+          "Answer": "Mummy",
+          "Points": 15
+        },
+        {
+          "Answer": "Werewolf",
+          "Points": 12
+        },
+        {
+          "Answer": "Zombie",
+          "Points": 6
+        },
+        {
+          "Answer": "Ghost / Phantom",
+          "Points": 4
+        }
+      ]
+    },
+    {
+      "Multiplier": 1,
+      "Question": "Name something people do when they get terrified watching a scary movie.",
+      "Answers": [
+        {
+          "Answer": "Cover their eyes / Hide face",
+          "Points": 48
+        },
+        {
+          "Answer": "Scream / Yell",
+          "Points": 27
+        },
+        {
+          "Answer": "Jump / Flinch",
+          "Points": 12
+        },
+        {
+          "Answer": "Turn on the lights",
+          "Points": 6
+        },
+        {
+          "Answer": "Grab a pillow or blanket",
+          "Points": 4
+        },
+        {
+          "Answer": "Mute or turn down volume",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name a room in a haunted house that feels the creepiest.",
+      "Answers": [
+        {
+          "Answer": "Basement / Cellar",
+          "Points": 47
+        },
+        {
+          "Answer": "Attic",
+          "Points": 26
+        },
+        {
+          "Answer": "Bathroom",
+          "Points": 11
+        },
+        {
+          "Answer": "Master Bedroom",
+          "Points": 8
+        },
+        {
+          "Answer": "Dark Kitchen",
+          "Points": 5
+        },
+        {
+          "Answer": "Long Hallway",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name a prop that makes a commercial haunted house attraction extra scary.",
+      "Answers": [
+        {
+          "Answer": "Chainsaw / Actor with power tool",
+          "Points": 39
+        },
+        {
+          "Answer": "Fog machine / Dense smoke",
+          "Points": 22
+        },
+        {
+          "Answer": "Strobe lights",
+          "Points": 18
+        },
+        {
+          "Answer": "Animatronic jump scares",
+          "Points": 11
+        },
+        {
+          "Answer": "Open coffin with skeleton",
+          "Points": 6
+        },
+        {
+          "Answer": "Hanging spider webs / Body bags",
+          "Points": 4
+        }
+      ]
+    },
+    {
+      "Multiplier": 3,
+      "Question": "Name a traditional weapon or item used to ward off or slay a vampire.",
+      "Answers": [
+        {
+          "Answer": "Wooden stake",
+          "Points": 53
+        },
+        {
+          "Answer": "Garlic",
+          "Points": 22
+        },
+        {
+          "Answer": "Holy water",
+          "Points": 12
+        },
+        {
+          "Answer": "Direct sunlight",
+          "Points": 8
+        },
+        {
+          "Answer": "Cross / Crucifix",
+          "Points": 3
+        },
+        {
+          "Answer": "Silver",
+          "Points": 2
+        }
+      ]
+    }
+  ],
+  "FastMoneyQuestions": [
+    {
+      "QuestionId": 1,
+      "Question": "Name a popular movie people love to rewatch every Halloween season.",
+      "Answers": [
+        { "Answer": "Hocus Pocus", "Points": 36 },
+        { "Answer": "Halloween (Michael Myers)", "Points": 24 },
+        { "Answer": "The Nightmare Before Christmas", "Points": 19 },
+        { "Answer": "Beetlejuice", "Points": 10 },
+        { "Answer": "Scream", "Points": 6 },
+        { "Answer": "Ghostbusters", "Points": 5 }
+      ]
+    },
+    {
+      "QuestionId": 2,
+      "Question": "Name something kids carry around to hold all their trick-or-treat candy.",
+      "Answers": [
+        { "Answer": "Plastic pumpkin bucket", "Points": 45 },
+        { "Answer": "Pillowcase", "Points": 28 },
+        { "Answer": "Tote bag / Canvas sack", "Points": 14 },
+        { "Answer": "Backpack", "Points": 7 },
+        { "Answer": "Paper / Plastic grocery bag", "Points": 4 },
+        { "Answer": "Witch's cauldron", "Points": 2 }
+      ]
+    },
+    {
+      "QuestionId": 3,
+      "Question": "Name a fear or phobia that comes up a lot around Halloween.",
+      "Answers": [
+        { "Answer": "Spiders (Arachnophobia)", "Points": 43 },
+        { "Answer": "The dark (Nyctophobia)", "Points": 24 },
+        { "Answer": "Clowns (Coulrophobia)", "Points": 16 },
+        { "Answer": "Ghosts / Spirits", "Points": 9 },
+        { "Answer": "Blood (Hemophobia)", "Points": 5 },
+        { "Answer": "Heights / Tight spaces", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 4,
+      "Question": "Name a food or drink item made with pumpkin or pumpkin spice in October.",
+      "Answers": [
+        { "Answer": "Pumpkin pie", "Points": 47 },
+        { "Answer": "Pumpkin spice latte / Coffee", "Points": 29 },
+        { "Answer": "Roasted pumpkin seeds", "Points": 13 },
+        { "Answer": "Pumpkin bread / Muffins", "Points": 6 },
+        { "Answer": "Pumpkin soup", "Points": 3 },
+        { "Answer": "Pumpkin beer / Cider", "Points": 2 }
+      ]
+    },
+    {
+      "QuestionId": 5,
+      "Question": "Name a clear sign that a house is welcoming trick-or-treaters.",
+      "Answers": [
+        { "Answer": "Porch light is turned on", "Points": 63 },
+        { "Answer": "Jack-o'-lantern is lit up", "Points": 18 },
+        { "Answer": "Halloween decorations on the lawn", "Points": 11 },
+        { "Answer": "Front door is wide open", "Points": 5 },
+        { "Answer": "Spooky music playing outside", "Points": 3 }
+      ]
+    }
+  ]
+}

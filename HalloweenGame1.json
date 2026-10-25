@@ -1,0 +1,212 @@
+{
+  "Rounds": [
+    {
+      "Multiplier": 1,
+      "Question": "Name a classic costume people wear for Halloween year after year.",
+      "Answers": [
+        {
+          "Answer": "Witch",
+          "Points": 34
+        },
+        {
+          "Answer": "Ghost",
+          "Points": 25
+        },
+        {
+          "Answer": "Vampire / Dracula",
+          "Points": 18
+        },
+        {
+          "Answer": "Zombie / Skeleton",
+          "Points": 12
+        },
+        {
+          "Answer": "Superhero / Batman",
+          "Points": 7
+        },
+        {
+          "Answer": "Black Cat",
+          "Points": 4
+        }
+      ]
+    },
+    {
+      "Multiplier": 1,
+      "Question": "Name something people put on their front porch to decorate for Halloween.",
+      "Answers": [
+        {
+          "Answer": "Jack-o'-Lantern / Pumpkins",
+          "Points": 42
+        },
+        {
+          "Answer": "Fake Spider Webs",
+          "Points": 26
+        },
+        {
+          "Answer": "Skeletons / Skulls",
+          "Points": 14
+        },
+        {
+          "Answer": "Ghosts / Tombstones",
+          "Points": 10
+        },
+        {
+          "Answer": "Scarecrow / Witch figure",
+          "Points": 5
+        },
+        {
+          "Answer": "Orange / Purple lights",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name a popular candy kids are happiest to get while trick-or-treating.",
+      "Answers": [
+        {
+          "Answer": "Reese's Peanut Butter Cups",
+          "Points": 44
+        },
+        {
+          "Answer": "Kit Kat",
+          "Points": 23
+        },
+        {
+          "Answer": "Snickers",
+          "Points": 16
+        },
+        {
+          "Answer": "M&M's",
+          "Points": 9
+        },
+        {
+          "Answer": "Twix",
+          "Points": 5
+        },
+        {
+          "Answer": "Skittles",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name a place you would never want to be stranded on Halloween night.",
+      "Answers": [
+        {
+          "Answer": "Cemetery / Graveyard",
+          "Points": 46
+        },
+        {
+          "Answer": "Haunted house / Abandoned mansion",
+          "Points": 24
+        },
+        {
+          "Answer": "Dark woods / Forest",
+          "Points": 15
+        },
+        {
+          "Answer": "Morgue / Funeral home",
+          "Points": 8
+        },
+        {
+          "Answer": "Corn maze",
+          "Points": 4
+        },
+        {
+          "Answer": "Ghost town",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 3,
+      "Question": "Name something you need to carve a jack-o'-lantern.",
+      "Answers": [
+        {
+          "Answer": "Pumpkin",
+          "Points": 51
+        },
+        {
+          "Answer": "Knife / Carving tool",
+          "Points": 28
+        },
+        {
+          "Answer": "Spoon / Scoop",
+          "Points": 11
+        },
+        {
+          "Answer": "Candle / LED tealight",
+          "Points": 6
+        },
+        {
+          "Answer": "Marker / Stencil",
+          "Points": 4
+        }
+      ]
+    }
+  ],
+  "FastMoneyQuestions": [
+    {
+      "QuestionId": 1,
+      "Question": "Name a movie monster that has a well-known weakness.",
+      "Answers": [
+        { "Answer": "Vampire / Dracula", "Points": 41 },
+        { "Answer": "Werewolf", "Points": 24 },
+        { "Answer": "Frankenstein's Monster", "Points": 17 },
+        { "Answer": "Wicked Witch", "Points": 9 },
+        { "Answer": "Mummy", "Points": 5 },
+        { "Answer": "Zombie", "Points": 4 }
+      ]
+    },
+    {
+      "QuestionId": 2,
+      "Question": "Name something you might find brewing in a witch's cauldron.",
+      "Answers": [
+        { "Answer": "Eye of newt", "Points": 38 },
+        { "Answer": "Frogs / Toad legs", "Points": 25 },
+        { "Answer": "Bat wings", "Points": 15 },
+        { "Answer": "Green slime / Bubbling potion", "Points": 11 },
+        { "Answer": "Spider webs / Spiders", "Points": 7 },
+        { "Answer": "Bones / Skull", "Points": 4 }
+      ]
+    },
+    {
+      "QuestionId": 3,
+      "Question": "Name a sound that would instantly creep you out in the middle of the night.",
+      "Answers": [
+        { "Answer": "Creaking door / Floorboards", "Points": 40 },
+        { "Answer": "Whispering / Spooky voice", "Points": 26 },
+        { "Answer": "Footsteps upstairs", "Points": 16 },
+        { "Answer": "Scratching inside the wall", "Points": 10 },
+        { "Answer": "Sudden laughter / Giggle", "Points": 5 },
+        { "Answer": "Tapping on the window", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 4,
+      "Question": "Name the worst thing a neighbor could hand out instead of candy.",
+      "Answers": [
+        { "Answer": "Toothbrush / Dental floss", "Points": 45 },
+        { "Answer": "Apple / Fruit", "Points": 24 },
+        { "Answer": "Pennies / Loose change", "Points": 15 },
+        { "Answer": "Raisins", "Points": 9 },
+        { "Answer": "Pencils / Erasers", "Points": 4 },
+        { "Answer": "Pamphlets / Coupons", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 5,
+      "Question": "Name an animal closely associated with witches and Halloween.",
+      "Answers": [
+        { "Answer": "Black cat", "Points": 52 },
+        { "Answer": "Bat", "Points": 22 },
+        { "Answer": "Owl", "Points": 12 },
+        { "Answer": "Raven / Crow", "Points": 8 },
+        { "Answer": "Toad / Frog", "Points": 4 },
+        { "Answer": "Spider", "Points": 2 }
+      ]
+    }
+  ]
+}
