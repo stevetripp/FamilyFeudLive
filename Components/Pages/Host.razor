@@ -157,9 +157,12 @@
                                 <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
                                        @bind="GameState.Team1.Name" />
                                 <div class="display-6 fw-bold text-danger">@GameState.Team1.Score</div>
-                                <div class="btn-group btn-group-sm mt-1">
-                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, -10)">-10</button>
-                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(1, +10)">+10</button>
+                                <div class="input-group input-group-sm mt-2">
+                                    <input type="text" inputmode="numeric" class="form-control form-control-sm bg-dark text-white text-center border-secondary"
+                                           placeholder="± pts" @bind="_team1ScoreInput" @onkeyup="e => HandleScoreKeyUp(e, 1)" />
+                                    <button class="btn btn-outline-danger fw-bold" @onclick="() => ApplyScoreAdjust(1)" title="Apply positive or negative score adjustment">
+                                        Apply
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -168,9 +171,12 @@
                                 <input class="form-control form-control-sm bg-dark text-white text-center border-0 fw-bold mb-1"
                                        @bind="GameState.Team2.Name" />
                                 <div class="display-6 fw-bold text-primary">@GameState.Team2.Score</div>
-                                <div class="btn-group btn-group-sm mt-1">
-                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, -10)">-10</button>
-                                    <button class="btn btn-outline-light" @onclick="() => GameState.AdjustScore(2, +10)">+10</button>
+                                <div class="input-group input-group-sm mt-2">
+                                    <input type="text" inputmode="numeric" class="form-control form-control-sm bg-dark text-white text-center border-secondary"
+                                           placeholder="± pts" @bind="_team2ScoreInput" @onkeyup="e => HandleScoreKeyUp(e, 2)" />
+                                    <button class="btn btn-outline-primary fw-bold" @onclick="() => ApplyScoreAdjust(2)" title="Apply positive or negative score adjustment">
+                                        Apply
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -635,6 +641,36 @@
     private string _customQuestionText = string.Empty;
     private int _customMultiplier = 1;
     private string _customAnswersRaw = string.Empty;
+
+    private string _team1ScoreInput = string.Empty;
+    private string _team2ScoreInput = string.Empty;
+
+    private void ApplyScoreAdjust(int teamNumber)
+    {
+        var input = teamNumber == 1 ? _team1ScoreInput : _team2ScoreInput;
+        if (string.IsNullOrWhiteSpace(input)) return;
+
+        var cleaned = input.Trim();
+        if (cleaned.StartsWith("+"))
+        {
+            cleaned = cleaned.Substring(1).Trim();
+        }
+
+        if (int.TryParse(cleaned, out int delta))
+        {
+            GameState.AdjustScore(teamNumber, delta);
+            if (teamNumber == 1) _team1ScoreInput = string.Empty;
+            else _team2ScoreInput = string.Empty;
+        }
+    }
+
+    private void HandleScoreKeyUp(KeyboardEventArgs e, int teamNumber)
+    {
+        if (e.Key == "Enter")
+        {
+            ApplyScoreAdjust(teamNumber);
+        }
+    }
 
     private bool _replaceExistingOnImport = false;
     private bool _showPasteJson = false;
