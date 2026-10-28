@@ -1,12 +1,12 @@
 # FamilyFeudLive
 
-An interactive, real-time Family Feud game show web application built with ASP.NET Core Blazor Server (.NET 9). It supports a big-screen display board for audiences, a mobile-friendly buzzer for contestants, and a host control panel for managing gameplay.
+An interactive, real-time Family Feud game show web application built with ASP.NET Core Blazor Server (.NET 10). It supports a big-screen display board for audiences, a mobile-friendly buzzer for contestants, and a host control panel for managing gameplay.
 
 ---
 
 ## Architecture & Project Structure
 
-- **Framework**: .NET 9.0 (ASP.NET Core Blazor Interactive Server)
+- **Framework**: .NET 10.0 (ASP.NET Core Blazor Interactive Server)
 - **State Management**: Singleton in-memory event-driven state service (`GameStateService`)
 
 ### Key Directories & Files
@@ -33,7 +33,7 @@ An interactive, real-time Family Feud game show web application built with ASP.N
 ## Development Workflow & Commands
 
 ### Prerequisites
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 
 ### Build & Run
 ```bash

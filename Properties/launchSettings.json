@@ -1,19 +1,21 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "FamilyFeudLive": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "http://0.0.0.0:5046;https://0.0.0.0:7267",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
+      "launchUrl": "http://localhost:5046",
+      "applicationUrl": "http://0.0.0.0:5046",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "FamilyFeudLive": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:5046",
       "applicationUrl": "http://0.0.0.0:5046",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
