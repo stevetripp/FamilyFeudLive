@@ -31,7 +31,7 @@ public class GameStateService
 
     public static readonly List<ThemeOption> AvailableThemes = new()
     {
-        new() { Id = "classic", Name = "Classic TV", Icon = "📺", Tagline = "Original Gold & Navy Game Show", PrimaryColor = "#f5b700", SeasonalTitle = "" },
+        new() { Id = "classic", Name = "Classic TV", Icon = "📺", Tagline = "Original Gold & Navy Game Show", PrimaryColor = "#f5b700", SeasonalTitle = "📺 CLASSIC TV EDITION 📺" },
         new() { Id = "valentines", Name = "Valentine's", Icon = "💖", Tagline = "Romantic Roses & Ruby Red", PrimaryColor = "#ff4d6d", SeasonalTitle = "💖 VALENTINE'S EDITION 💖" },
         new() { Id = "july4th", Name = "4th of July", Icon = "🎆", Tagline = "Patriotic Red, White & Blue", PrimaryColor = "#e63946", SeasonalTitle = "🎆 4TH OF JULY SPECIAL 🎆" },
         new() { Id = "halloween", Name = "Halloween", Icon = "🎃", Tagline = "Spooky Pumpkin Orange & Midnight Purple", PrimaryColor = "#ff7b00", SeasonalTitle = "🎃 HALLOWEEN SPOOKTACULAR 🎃" },
@@ -878,16 +878,18 @@ public class GameStateService
         }
     }
 
-    public void RevealAllFastMoney(int playerNumber)
+    public void RevealAllFastMoney(int? playerNumber = null)
     {
         lock (_lock)
         {
-            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            int target = playerNumber ?? FastMoney.CurrentPlayer;
+            var list = target == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
             foreach (var slot in list)
             {
                 slot.IsAnswerRevealed = true;
                 slot.IsPointsRevealed = true;
             }
+
             LastDingEventId = DateTime.UtcNow.Ticks;
             if (FastMoney.HasWonGrandPrize)
             {
@@ -897,16 +899,89 @@ public class GameStateService
         }
     }
 
-    public void HideAllFastMoney(int playerNumber)
+    public void RevealAllFastMoneyAnswers(int? playerNumber = null)
     {
         lock (_lock)
         {
-            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            int target = playerNumber ?? FastMoney.CurrentPlayer;
+            var list = target == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            foreach (var slot in list)
+            {
+                slot.IsAnswerRevealed = true;
+            }
+
+            LastDingEventId = DateTime.UtcNow.Ticks;
+            NotifyStateChanged();
+        }
+    }
+
+    public void RevealAllFastMoneyPoints(int? playerNumber = null)
+    {
+        lock (_lock)
+        {
+            int target = playerNumber ?? FastMoney.CurrentPlayer;
+            var list = target == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            foreach (var slot in list)
+            {
+                slot.IsPointsRevealed = true;
+            }
+
+            LastDingEventId = DateTime.UtcNow.Ticks;
+            if (FastMoney.HasWonGrandPrize)
+            {
+                LastWinEventId = DateTime.UtcNow.Ticks;
+            }
+            NotifyStateChanged();
+        }
+    }
+
+    public void HideAllFastMoney(int? playerNumber = null)
+    {
+        HideAllFastMoneyAnswersAndPoints(playerNumber);
+    }
+
+    public void HideAllFastMoneyAnswersAndPoints(int? playerNumber = null)
+    {
+        lock (_lock)
+        {
+            int target = playerNumber ?? FastMoney.CurrentPlayer;
+            var list = target == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
             foreach (var slot in list)
             {
                 slot.IsAnswerRevealed = false;
                 slot.IsPointsRevealed = false;
             }
+
+            NotifyStateChanged();
+        }
+    }
+
+    public void HideAllFastMoneyAnswers(int? playerNumber = null)
+    {
+        lock (_lock)
+        {
+            int target = playerNumber ?? FastMoney.CurrentPlayer;
+            var list = target == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            foreach (var slot in list)
+            {
+                slot.IsAnswerRevealed = false;
+            }
+
+            NotifyStateChanged();
+        }
+    }
+
+    public void HideAllFastMoneyPoints(int? playerNumber = null)
+    {
+        lock (_lock)
+        {
+            int target = playerNumber ?? FastMoney.CurrentPlayer;
+            var list = target == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            foreach (var slot in list)
+            {
+                slot.IsPointsRevealed = false;
+            }
+
             NotifyStateChanged();
         }
     }

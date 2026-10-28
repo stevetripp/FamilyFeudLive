@@ -21,16 +21,16 @@
         <!-- Top Scoreboard Bar -->
         <div class="scoreboard-header">
             <!-- Team 1 Box -->
-            <div class="team-box" style="color: @GameState.Team1.Color;">
+            <div class="team-box" style="@($"color: {GameState.Team1.Color};")">
                 <div class="team-name">@GameState.Team1.Name</div>
                 <div class="team-score">@GameState.Team1.Score</div>
             </div>
 
             <!-- Team 1 Buzzer QR Code (Between Team 1 Points and Round Bank) -->
             <div class="team-qr-container">
-                <a href="@_team1BuzzerUrl" target="_blank" class="team-qr-link" title="Join @GameState.Team1.Name (@_team1BuzzerUrl)">
-                    <div class="team-qr-card" style="--team-glow: @GameState.Team1.Color; border-color: @GameState.Team1.Color;">
-                        <div class="team-qr-badge" style="background-color: @GameState.Team1.Color;">
+                <a href="@_team1BuzzerUrl" target="_blank" class="team-qr-link" title="@($"Join {GameState.Team1.Name} ({_team1BuzzerUrl})")">
+                    <div class="team-qr-card" style="@($"--team-glow: {GameState.Team1.Color}; border-color: {GameState.Team1.Color};")">
+                        <div class="team-qr-badge" style="@($"background-color: {GameState.Team1.Color};")">
                             📱 BUZZ IN
                         </div>
                         <div class="team-qr-graphic">
@@ -39,7 +39,7 @@
                                 @((MarkupString)_team1QrSvg)
                             }
                         </div>
-                        <div class="team-qr-teamname" style="color: @GameState.Team1.Color;">
+                        <div class="team-qr-teamname" style="@($"color: {GameState.Team1.Color};")">
                             @GameState.Team1.Name
                         </div>
                     </div>
@@ -57,9 +57,9 @@
 
             <!-- Team 2 Buzzer QR Code (Between Round Bank and Team 2 Points) -->
             <div class="team-qr-container">
-                <a href="@_team2BuzzerUrl" target="_blank" class="team-qr-link" title="Join @GameState.Team2.Name (@_team2BuzzerUrl)">
-                    <div class="team-qr-card" style="--team-glow: @GameState.Team2.Color; border-color: @GameState.Team2.Color;">
-                        <div class="team-qr-badge" style="background-color: @GameState.Team2.Color;">
+                <a href="@_team2BuzzerUrl" target="_blank" class="team-qr-link" title="@($"Join {GameState.Team2.Name} ({_team2BuzzerUrl})")">
+                    <div class="team-qr-card" style="@($"--team-glow: {GameState.Team2.Color}; border-color: {GameState.Team2.Color};")">
+                        <div class="team-qr-badge" style="@($"background-color: {GameState.Team2.Color};")">
                             📱 BUZZ IN
                         </div>
                         <div class="team-qr-graphic">
@@ -68,7 +68,7 @@
                                 @((MarkupString)_team2QrSvg)
                             }
                         </div>
-                        <div class="team-qr-teamname" style="color: @GameState.Team2.Color;">
+                        <div class="team-qr-teamname" style="@($"color: {GameState.Team2.Color};")">
                             @GameState.Team2.Name
                         </div>
                     </div>
@@ -76,7 +76,7 @@
             </div>
 
             <!-- Team 2 Box -->
-            <div class="team-box" style="color: @GameState.Team2.Color;">
+            <div class="team-box" style="@($"color: {GameState.Team2.Color};")">
                 <div class="team-name">@GameState.Team2.Name</div>
                 <div class="team-score">@GameState.Team2.Score</div>
             </div>
@@ -91,11 +91,11 @@
         @if (GameState.Buzzer.WinnerTeam != null)
         {
             var winnerColor = GameState.GetTeamColor(GameState.Buzzer.WinnerTeam);
-            <div class="buzzer-alert-banner" style="--banner-color: @winnerColor;">
+            <div class="buzzer-alert-banner" style="@($"--banner-color: {winnerColor};")">
                 🔔 @GameState.Buzzer.WinnerTeam.ToUpper()
                 @if (!string.IsNullOrWhiteSpace(GameState.Buzzer.WinnerPlayer))
                 {
-                    <span>(@GameState.Buzzer.WinnerPlayer)</span>
+                    <span>(@(GameState.Buzzer.WinnerPlayer))</span>
                 }
                 BUZZED IN FIRST!
             </div>
@@ -141,11 +141,6 @@
                 </div>
             }
         </div>
-
-        <!-- Footer join hint -->
-        <div class="text-center mt-4 text-light opacity-50 small">
-            To buzz in, scan your team's QR code above or join at: <strong class="text-warning">@(QrService.BuildBuzzerUrl(Nav.Uri))</strong>
-        </div>
     </div>
 }
 else
@@ -163,11 +158,15 @@ else
 
         <!-- Top Fast Money Header -->
         <div class="fastmoney-header">
+            @{
+                var fmTeamColor = GameState.FastMoney.WinningTeamNumber == 1 ? GameState.Team1.Color : GameState.Team2.Color;
+                var fmTeamName = GameState.FastMoney.WinningTeamNumber == 1 ? GameState.Team1.Name : GameState.Team2.Name;
+            }
             <!-- Winning Team Info -->
-            <div class="fm-team-card" style="--team-glow: @(GameState.FastMoney.WinningTeamNumber == 1 ? GameState.Team1.Color : GameState.Team2.Color);">
+            <div class="fm-team-card" style="@($"--team-glow: {fmTeamColor};")">
                 <div class="fm-team-title">PLAYING FOR THE GRAND PRIZE</div>
-                <div class="fm-team-name" style="color: @(GameState.FastMoney.WinningTeamNumber == 1 ? GameState.Team1.Color : GameState.Team2.Color);">
-                    @(GameState.FastMoney.WinningTeamNumber == 1 ? GameState.Team1.Name : GameState.Team2.Name)
+                <div class="fm-team-name" style="@($"color: {fmTeamColor};")">
+                    @fmTeamName
                 </div>
             </div>
 
@@ -203,17 +202,15 @@ else
 
         <!-- 5 Questions / Answers Dual Columns Board -->
         <div class="fm-grid-board my-4">
-            <!-- Columns Header: Player 1 / Questions / Player 2 -->
+            <!-- Columns Header: Player 1 / Player 2 -->
             <div class="fm-column-header-row">
                 <div class="fm-column-header">PLAYER 1</div>
-                <div class="fm-column-header-center">SURVEY QUESTIONS</div>
                 <div class="fm-column-header">PLAYER 2</div>
             </div>
 
             @for (int i = 0; i < Math.Min(5, GameState.FastMoney.Questions.Count); i++)
             {
                 var qIndex = i;
-                var question = GameState.FastMoney.Questions[qIndex];
                 var p1 = qIndex < GameState.FastMoney.Player1Answers.Count ? GameState.FastMoney.Player1Answers[qIndex] : null;
                 var p2 = qIndex < GameState.FastMoney.Player2Answers.Count ? GameState.FastMoney.Player2Answers[qIndex] : null;
 
@@ -226,19 +223,6 @@ else
                         <div class="fm-slot-points @(p1 != null && p1.IsPointsRevealed ? "points-active" : "")">
                             @(p1 != null && p1.IsPointsRevealed ? p1.Points.ToString() : "")
                         </div>
-                    </div>
-
-                    <!-- Question Number & Prompt Indicator -->
-                    <div class="fm-slot-center @(question.IsRevealed ? "revealed" : "hidden")" title="@(question.IsRevealed ? question.Question : $"Question #{i + 1}")">
-                        <span class="fm-q-badge">#@(i + 1)</span>
-                        @if (question.IsRevealed)
-                        {
-                            <span class="fm-q-text">@question.Question</span>
-                        }
-                        else
-                        {
-                            <span class="fm-q-hidden">••••••••</span>
-                        }
                     </div>
 
                     <!-- Player 2 Answer & Points -->

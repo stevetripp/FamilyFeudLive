@@ -471,19 +471,38 @@
                         </div>
                     }
 
-                    <!-- Batch actions -->
-                    <div class="d-grid gap-2">
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-info" @onclick="() => GameState.RevealAllFastMoney(1)">Reveal All P1</button>
-                            <button class="btn btn-outline-info" @onclick="() => GameState.RevealAllFastMoney(2)">Reveal All P2</button>
+                    <!-- Player Visibility Controls (Answers & Points Independent) -->
+                    <div class="p-3 bg-dark bg-opacity-75 rounded border border-info mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-info fw-bold small">👤 P@(GameState.FastMoney.CurrentPlayer) BOARD VISIBILITY</span>
+                            <span class="badge bg-info text-dark">Active Player</span>
                         </div>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-secondary" @onclick="() => GameState.HideAllFastMoney(1)">Hide P1</button>
-                            <button class="btn btn-outline-secondary" @onclick="() => GameState.HideAllFastMoney(2)">Hide P2</button>
+
+                        <!-- Answers Row -->
+                        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                            <span class="text-light small fw-bold">Answers:</span>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-info" @onclick="() => GameState.RevealAllFastMoneyAnswers()">
+                                    👁️ Show
+                                </button>
+                                <button class="btn btn-outline-secondary" @onclick="() => GameState.HideAllFastMoneyAnswers()">
+                                    🙈 Hide
+                                </button>
+                            </div>
                         </div>
-                        <button class="btn btn-outline-danger btn-sm" @onclick="() => GameState.ResetFastMoneyRound()">
-                            ⚠️ Reset Fast Money Round
-                        </button>
+
+                        <!-- Points Row -->
+                        <div class="d-flex align-items-center justify-content-between gap-2">
+                            <span class="text-light small fw-bold">Points:</span>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-warning" @onclick="() => GameState.RevealAllFastMoneyPoints()">
+                                    👁️ Show
+                                </button>
+                                <button class="btn btn-outline-secondary" @onclick="() => GameState.HideAllFastMoneyPoints()">
+                                    🙈 Hide
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -492,17 +511,9 @@
             <div class="col-lg-8">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                     <h5 class="fw-bold text-warning mb-0">📝 5 Survey Questions & Live Recording</h5>
-                    <div class="d-flex gap-2">
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-warning" @onclick="() => GameState.RevealAllFastMoneyQuestions()">
-                                Reveal All Questions
-                            </button>
-                            <button class="btn btn-outline-secondary" @onclick="() => GameState.HideAllFastMoneyQuestions()">
-                                Hide All Questions
-                            </button>
-                        </div>
-                        <button class="btn btn-sm btn-outline-info" @onclick="LoadSampleRoundsFile">
-                            📄 Reload Questions
+                    <div>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => GameState.ResetFastMoneyRound()" title="Reset Fast Money round to play again (clears answers, conceals board, and resets clock to Player 1)">
+                            🔄 Reset
                         </button>
                     </div>
                 </div>
@@ -515,26 +526,10 @@
                     var p2 = qIndex < GameState.FastMoney.Player2Answers.Count ? GameState.FastMoney.Player2Answers[qIndex] : null;
 
                     <div class="fm-host-qcard">
-                        <!-- Question Header with Reveal Button -->
-                        <div class="fm-host-qheader d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-warning text-dark fw-bold">Q@(qIndex + 1)</span>
-                                <span class="fw-bold @(q.IsRevealed ? "text-light" : "text-secondary")">@q.Question</span>
-                                @if (q.IsRevealed)
-                                {
-                                    <span class="badge bg-success small">ON TV</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary small">HIDDEN ON TV</span>
-                                }
-                            </div>
-                            <div>
-                                <button class="btn btn-sm @(q.IsRevealed ? "btn-secondary" : "btn-warning text-dark fw-bold")"
-                                        @onclick="() => GameState.ToggleFastMoneyQuestionReveal(qIndex)">
-                                    @(q.IsRevealed ? "Hide Question" : "👁️ Reveal Question")
-                                </button>
-                            </div>
+                        <!-- Question Header -->
+                        <div class="fm-host-qheader d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark fw-bold">Q@(qIndex + 1)</span>
+                            <span class="fw-bold text-light fs-6">@q.Question</span>
                         </div>
 
                         <!-- Top Survey Answers Quick-Pick Bar -->
