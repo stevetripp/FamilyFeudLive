@@ -515,6 +515,44 @@ public class GameStateService
         }
     }
 
+    public void ToggleQuestionReveal()
+    {
+        lock (_lock)
+        {
+            CurrentQuestion.IsRevealed = !CurrentQuestion.IsRevealed;
+            if (CurrentQuestion.IsRevealed)
+            {
+                LastDingEventId = DateTime.UtcNow.Ticks;
+            }
+            NotifyStateChanged();
+        }
+    }
+
+    public void RevealQuestion()
+    {
+        lock (_lock)
+        {
+            if (!CurrentQuestion.IsRevealed)
+            {
+                CurrentQuestion.IsRevealed = true;
+                LastDingEventId = DateTime.UtcNow.Ticks;
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public void HideQuestion()
+    {
+        lock (_lock)
+        {
+            if (CurrentQuestion.IsRevealed)
+            {
+                CurrentQuestion.IsRevealed = false;
+                NotifyStateChanged();
+            }
+        }
+    }
+
     public void AddStrike()
     {
         lock (_lock)
@@ -611,6 +649,7 @@ public class GameStateService
             ResetBuzzer();
             foreach (var q in Questions)
             {
+                q.IsRevealed = false;
                 foreach (var a in q.Answers)
                 {
                     a.IsRevealed = false;

@@ -13,6 +13,7 @@ public class Question
     public int Id { get; set; }
     public string Text { get; set; } = string.Empty;
     public int Multiplier { get; set; } = 1;
+    public bool IsRevealed { get; set; } = false;
     public List<AnswerItem> Answers { get; set; } = new();
 }
 

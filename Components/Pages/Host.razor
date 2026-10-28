@@ -217,9 +217,22 @@
                         </button>
                     </div>
 
-                    <!-- Question Title -->
+                    <!-- Question Title with Show/Hide Toggle -->
                     <div class="p-3 bg-dark rounded border border-secondary mb-3">
-                        <div class="text-warning small fw-bold mb-1">SURVEY QUESTION:</div>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-warning small fw-bold">SURVEY QUESTION:</span>
+                                <span class="badge @(GameState.CurrentQuestion.IsRevealed ? "bg-success" : "bg-secondary")">
+                                    @(GameState.CurrentQuestion.IsRevealed ? "🟢 ON TV" : "🙈 HIDDEN ON TV")
+                                </span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm @(GameState.CurrentQuestion.IsRevealed ? "btn-outline-secondary" : "btn-warning text-dark fw-bold")"
+                                        @onclick="() => GameState.ToggleQuestionReveal()">
+                                    @(GameState.CurrentQuestion.IsRevealed ? "🙈 Hide Question" : "👁️ Reveal Question")
+                                </button>
+                            </div>
+                        </div>
                         <h5 class="fw-bold text-white mb-0">@GameState.CurrentQuestion.Text</h5>
                     </div>
 

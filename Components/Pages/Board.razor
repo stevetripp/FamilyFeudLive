@@ -83,9 +83,12 @@
         </div>
 
         <!-- Question Display -->
-        <div class="question-bar">
-            @GameState.CurrentQuestion.Text
-        </div>
+        @if (GameState.CurrentQuestion.IsRevealed)
+        {
+            <div class="question-bar">
+                @GameState.CurrentQuestion.Text
+            </div>
+        }
 
         <!-- Live Buzzer Winner Alert -->
         @if (GameState.Buzzer.WinnerTeam != null)
