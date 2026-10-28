@@ -1,6 +1,8 @@
 @page "/host"
 @layout GameLayout
 @inject GameStateService GameState
+@inject QrCodeService QrService
+@inject NavigationManager Nav
 @inject IJSRuntime JS
 @implements IDisposable
 
@@ -390,7 +392,10 @@
                                 Team 2: @GameState.Team2.Name
                             </button>
                         </div>
-                        <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="@_fastMoneyQuestionsUrl" target="_blank" class="btn btn-outline-info btn-sm">
+                                📱 Phone Questions ↗
+                            </a>
                             <span class="badge bg-success fs-6">🟢 LIVE ON TV BOARD</span>
                         </div>
                     </div>
@@ -517,6 +522,44 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Phone Reader QR Code Card -->
+                <div class="fm-host-card border-warning text-center">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold text-warning mb-0">📲 Phone Question Reader</h6>
+                        <span class="badge bg-warning text-dark small">Host Card</span>
+                    </div>
+                    <div class="small text-secondary mb-2">
+                        Scan with your phone to read questions to contestants:
+                    </div>
+
+                    <div class="fm-qr-graphic shadow-sm mb-2">
+                        @if (!string.IsNullOrEmpty(_fastMoneyQrCodeSvg))
+                        {
+                            @((MarkupString)_fastMoneyQrCodeSvg)
+                        }
+                    </div>
+
+                    <div class="mb-2">
+                        <a href="@_fastMoneyQuestionsUrl" target="_blank" class="badge bg-dark border border-secondary text-info text-decoration-none small font-monospace px-2 py-1 user-select-all">
+                            @_fastMoneyQuestionsUrl ↗
+                        </a>
+                    </div>
+
+                    @if (_availableHostIps.Count > 1)
+                    {
+                        <div class="mt-2 pt-2 border-top border-secondary text-start">
+                            <label class="form-label text-secondary small fw-bold mb-1">Wi-Fi / Network IP:</label>
+                            <select class="form-select form-select-sm bg-dark text-white border-secondary"
+                                    @bind="_selectedHostIp" @bind:after="UpdateFastMoneyQrCode">
+                                @foreach (var ip in _availableHostIps)
+                                {
+                                    <option value="@ip">@ip</option>
+                                }
+                            </select>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -686,9 +729,33 @@
     private string? _importSuccessMessage;
     private string? _importErrorMessage;
 
+    private List<string> _availableHostIps = new();
+    private string _selectedHostIp = "localhost";
+    private int _serverPort = 5046;
+    private string _fastMoneyQuestionsUrl = string.Empty;
+    private string _fastMoneyQrCodeSvg = string.Empty;
+
     protected override void OnInitialized()
     {
         GameState.OnChange += HandleStateChanged;
+        try
+        {
+            _serverPort = QrService.ResolvePort(Nav.Uri);
+            _availableHostIps = QrService.GetLocalIPv4Addresses();
+            _selectedHostIp = QrService.ResolveHostIp(Nav.Uri);
+        }
+        catch
+        {
+            _selectedHostIp = "localhost";
+            _serverPort = 5046;
+        }
+        UpdateFastMoneyQrCode();
+    }
+
+    private void UpdateFastMoneyQrCode()
+    {
+        _fastMoneyQuestionsUrl = $"http://{_selectedHostIp}:{_serverPort}/fastmoney-questions";
+        _fastMoneyQrCodeSvg = QrService.GenerateSvgQrCode(_fastMoneyQuestionsUrl);
     }
 
     private async void HandleStateChanged()

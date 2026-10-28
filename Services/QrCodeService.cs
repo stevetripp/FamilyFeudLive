@@ -72,6 +72,14 @@ public class QrCodeService
         }
     }
 
+    public string BuildUrl(string currentUri, string path)
+    {
+        var host = ResolveHostIp(currentUri);
+        var port = ResolvePort(currentUri);
+        var normalizedPath = path.StartsWith('/') ? path : "/" + path;
+        return $"http://{host}:{port}{normalizedPath}";
+    }
+
     public string BuildBuzzerUrl(string currentUri, string? team = null)
     {
         var host = ResolveHostIp(currentUri);
@@ -89,7 +97,7 @@ public class QrCodeService
         using var qrGenerator = new QRCodeGenerator();
         using var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
         var qrCode = new SvgQRCode(qrCodeData);
-        // SvgQRCode generates pure SVG xml
-        return qrCode.GetGraphic(10);
+        // SvgQRCode generates pure SVG xml with ViewBox sizing mode for responsive scaling
+        return qrCode.GetGraphic(10, "#000000", "#ffffff", true, SvgQRCode.SizingMode.ViewBoxAttribute);
     }
 }

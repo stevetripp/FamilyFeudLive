@@ -1,0 +1,101 @@
+@page "/fastmoney-questions"
+@layout GameLayout
+@inject GameStateService GameState
+@inject NavigationManager Nav
+@implements IDisposable
+
+<div class="fm-phone-container">
+    <!-- Header Title -->
+    <div class="text-center py-2 mb-3">
+        <h4 class="fw-bold text-warning mb-0">⚡ Fast Money Questions</h4>
+        <small class="text-secondary">Host Reading Card</small>
+    </div>
+
+    <!-- Question Cards List -->
+    @if (GameState.FastMoney.Questions.Count == 0)
+    {
+        <div class="card bg-dark text-white border-warning p-4 text-center">
+            <div class="display-4 mb-2">📋</div>
+            <h5 class="text-warning fw-bold">No Fast Money Questions Loaded</h5>
+            <p class="text-secondary small mb-3">
+                Load questions in the Host Desk on your computer, and they will immediately appear here.
+            </p>
+            <a href="/host" class="btn btn-outline-info btn-sm">Go to Host Desk</a>
+        </div>
+    }
+    else
+    {
+        <div class="fm-phone-questions-list">
+            @for (int i = 0; i < Math.Min(5, GameState.FastMoney.Questions.Count); i++)
+            {
+                var qIndex = i;
+                var q = GameState.FastMoney.Questions[qIndex];
+
+                <div class="card bg-dark text-white border-warning shadow-sm mb-3 fm-phone-qcard">
+                    <div class="card-header bg-dark bg-opacity-75 border-bottom border-secondary d-flex justify-content-between align-items-center py-2 px-3">
+                        <span class="badge bg-warning text-dark fw-bold fs-6">Question @(qIndex + 1)</span>
+                        @if (q.Answers.Count > 0)
+                        {
+                            <span class="badge bg-success bg-opacity-75 text-white fw-bold">
+                                #1: @q.Answers[0].Answer (@q.Answers[0].Points pts)
+                            </span>
+                        }
+                    </div>
+
+                    <div class="card-body p-3">
+                        <!-- Big Bold Question Text For Host Reading -->
+                        <div class="fm-phone-qtext">
+                            @q.Question
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Quick Footer Navigation -->
+    <div class="text-center text-secondary small py-3">
+        <span>Family Feud Live • Fast Money Host Assistant</span>
+    </div>
+</div>
+
+<style>
+    .fm-phone-container {
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 12px;
+        min-height: 100vh;
+    }
+
+    .fm-phone-qcard {
+        border-width: 2px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .fm-phone-qtext {
+        font-size: 1.3rem;
+        font-weight: 700;
+        line-height: 1.4;
+        color: #ffffff;
+        letter-spacing: 0.3px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+</style>
+
+@code {
+    protected override void OnInitialized()
+    {
+        GameState.OnChange += HandleStateChanged;
+    }
+
+    private async void HandleStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        GameState.OnChange -= HandleStateChanged;
+    }
+}
