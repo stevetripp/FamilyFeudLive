@@ -1,0 +1,224 @@
+{
+  "Rounds": [
+    {
+      "Multiplier": 1,
+      "Question": "Besides food, name something people put on their table specifically for Thanksgiving dinner.",
+      "Answers": [
+        {
+          "Answer": "Centerpiece / Cornucopia / Flowers",
+          "Points": 33
+        },
+        {
+          "Answer": "Fancy china / Fine silverware",
+          "Points": 25
+        },
+        {
+          "Answer": "Tablecloth / Table runner",
+          "Points": 16
+        },
+        {
+          "Answer": "Cloth napkins / Napkin rings",
+          "Points": 11
+        },
+        {
+          "Answer": "Gravy boat",
+          "Points": 8
+        },
+        {
+          "Answer": "Candles",
+          "Points": 4
+        },
+        {
+          "Answer": "Place cards / Name cards",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 1,
+      "Question": "Name a food item people make with leftover Thanksgiving turkey.",
+      "Answers": [
+        {
+          "Answer": "Turkey sandwich",
+          "Points": 51
+        },
+        {
+          "Answer": "Turkey soup / Broth",
+          "Points": 23
+        },
+        {
+          "Answer": "Turkey pot pie",
+          "Points": 12
+        },
+        {
+          "Answer": "Turkey casserole / Tetrazzini",
+          "Points": 7
+        },
+        {
+          "Answer": "Turkey salad",
+          "Points": 4
+        },
+        {
+          "Answer": "Turkey tacos / Enchiladas",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name a topic of conversation that is best avoided at the Thanksgiving table.",
+      "Answers": [
+        {
+          "Answer": "Politics / Elections",
+          "Points": 49
+        },
+        {
+          "Answer": "Religion / Beliefs",
+          "Points": 22
+        },
+        {
+          "Answer": "Personal finances / Money",
+          "Points": 13
+        },
+        {
+          "Answer": "Dating life / Marriage / Having kids",
+          "Points": 9
+        },
+        {
+          "Answer": "Weight / Dieting",
+          "Points": 4
+        },
+        {
+          "Answer": "Family drama / Secrets / Old grudges",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name someplace people shop on Black Friday right after Thanksgiving.",
+      "Answers": [
+        {
+          "Answer": "Best Buy",
+          "Points": 39
+        },
+        {
+          "Answer": "Walmart",
+          "Points": 26
+        },
+        {
+          "Answer": "Target",
+          "Points": 14
+        },
+        {
+          "Answer": "The Mall / Department stores",
+          "Points": 8
+        },
+        {
+          "Answer": "Costco / Sam's Club",
+          "Points": 6
+        },
+        {
+          "Answer": "Amazon / Online shopping",
+          "Points": 4
+        },
+        {
+          "Answer": "Kohl's",
+          "Points": 3
+        }
+      ]
+    },
+    {
+      "Multiplier": 3,
+      "Question": "Name an ingredient used in traditional Thanksgiving stuffing or dressing.",
+      "Answers": [
+        {
+          "Answer": "Bread cubes / Cornbread",
+          "Points": 47
+        },
+        {
+          "Answer": "Celery",
+          "Points": 24
+        },
+        {
+          "Answer": "Onions",
+          "Points": 15
+        },
+        {
+          "Answer": "Seasoning",
+          "Points": 8
+        },
+        {
+          "Answer": "Broth / Stock (Chicken or Turkey) / Butter",
+          "Points": 4
+        },
+        {
+          "Answer": "Sausage / Meat",
+          "Points": 2
+        }
+      ]
+    }
+  ],
+  "FastMoneyQuestions": [
+    {
+      "QuestionId": 1,
+      "Question": "Name a popular topping people put on top of their Thanksgiving pie.",
+      "Answers": [
+        { "Answer": "Whipped cream / Cool Whip", "Points": 51 },
+        { "Answer": "Vanilla ice cream (À la mode)", "Points": 27 },
+        { "Answer": "Caramel drizzle / Sauce", "Points": 9 },
+        { "Answer": "Chopped pecans / Walnuts", "Points": 6 },
+        { "Answer": "Chocolate sauce / Hot fudge", "Points": 4 },
+        { "Answer": "Cinnamon / Sugar", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 2,
+      "Question": "Name the hour of the day your family actually eats Thanksgiving dinner.",
+      "Answers": [
+        { "Answer": "2:00 PM", "Points": 35 },
+        { "Answer": "1:00 PM", "Points": 24 },
+        { "Answer": "3:00 PM", "Points": 19 },
+        { "Answer": "4:00 PM", "Points": 11 },
+        { "Answer": "5:00 PM", "Points": 7 },
+        { "Answer": "12:00 PM (Noon)", "Points": 4 }
+      ]
+    },
+    {
+      "QuestionId": 3,
+      "Question": "Name something people loosen or take off after stuffing themselves with Thanksgiving dinner.",
+      "Answers": [
+        { "Answer": "Belt", "Points": 56 },
+        { "Answer": "Pants / Unbutton pants", "Points": 24 },
+        { "Answer": "Shoes", "Points": 10 },
+        { "Answer": "Tie / Collar", "Points": 5 },
+        { "Answer": "Jacket / Sweater", "Points": 3 },
+        { "Answer": "Bra", "Points": 2 }
+      ]
+    },
+    {
+      "QuestionId": 4,
+      "Question": "Besides turkey, name another meat sometimes served at Thanksgiving.",
+      "Answers": [
+        { "Answer": "Ham / Pork roast", "Points": 58 },
+        { "Answer": "Roast beef / Prime rib", "Points": 17 },
+        { "Answer": "Chicken / Duck / Goose", "Points": 12 },
+        { "Answer": "Brisket", "Points": 6 },
+        { "Answer": "Fish / Salmon / Seafood", "Points": 4 },
+        { "Answer": "Lamb", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 5,
+      "Question": "Name a traditional Thanksgiving decoration you made in elementary school.",
+      "Answers": [
+        { "Answer": "Handprint / Pinecone turkey craft", "Points": 60 },
+        { "Answer": "Paper Pilgrim hat", "Points": 18 },
+        { "Answer": "Paper feather headdress / Headband", "Points": 10 },
+        { "Answer": "Paper plate cornucopia / Mayflower", "Points": 7 },
+        { "Answer": "Construction paper leaves / Garland", "Points": 3 },
+        { "Answer": "Popsicle stick cabin / Teepee", "Points": 2 }
+      ]
+    }
+  ]
+}

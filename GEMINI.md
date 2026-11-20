@@ -27,6 +27,7 @@ An interactive, real-time Family Feud game show web application built with ASP.N
 - **Question Sets (`*.json`)**:
   - `SampleRounds.json`: Default round question sets and Fast Money questions ready to be imported through the Host dashboard.
   - `HalloweenGame1.json`, `HalloweenGame2.json`: Themed question sets for seasonal games.
+  - `ThanksgivingGame1.json`, `ThanksgivingGame2.json`: Themed question sets for Thanksgiving games.
 
 ---
 

@@ -1,0 +1,240 @@
+{
+  "Rounds": [
+    {
+      "Multiplier": 1,
+      "Question": "Name a traditional side dish served at Thanksgiving dinner.",
+      "Answers": [
+        {
+          "Answer": "Stuffing / Dressing",
+          "Points": 34
+        },
+        {
+          "Answer": "Mashed Potatoes",
+          "Points": 24
+        },
+        {
+          "Answer": "Cranberry Sauce / Cranberries",
+          "Points": 13
+        },
+        {
+          "Answer": "Green Bean Casserole",
+          "Points": 10
+        },
+        {
+          "Answer": "Sweet Potato Casserole / Yams",
+          "Points": 8
+        },
+        {
+          "Answer": "Dinner Rolls / Biscuits",
+          "Points": 5
+        },
+        {
+          "Answer": "Macaroni & Cheese",
+          "Points": 4
+        },
+        {
+          "Answer": "Corn / Creamed Corn",
+          "Points": 2
+        }
+      ]
+    },
+    {
+      "Multiplier": 1,
+      "Question": "Name something people do right after finishing Thanksgiving dinner.",
+      "Answers": [
+        {
+          "Answer": "Take a nap / Sleep / Lie down",
+          "Points": 37
+        },
+        {
+          "Answer": "Watch football / Watch TV",
+          "Points": 24
+        },
+        {
+          "Answer": "Eat dessert / Pie",
+          "Points": 14
+        },
+        {
+          "Answer": "Clean up / Wash dishes / Pack leftovers",
+          "Points": 8
+        },
+        {
+          "Answer": "Talk / Visit with family / Socialize",
+          "Points": 6
+        },
+        {
+          "Answer": "Loosen belt / Change into sweatpants",
+          "Points": 5
+        },
+        {
+          "Answer": "Play board games / Cards",
+          "Points": 4
+        },
+        {
+          "Answer": "Go for a walk",
+          "Points": 2
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name a pie people commonly eat on Thanksgiving besides pumpkin pie.",
+      "Answers": [
+        {
+          "Answer": "Pecan pie",
+          "Points": 36
+        },
+        {
+          "Answer": "Apple pie",
+          "Points": 30
+        },
+        {
+          "Answer": "Sweet potato pie",
+          "Points": 13
+        },
+        {
+          "Answer": "Cherry pie",
+          "Points": 7
+        },
+        {
+          "Answer": "Chocolate / French Silk pie",
+          "Points": 5
+        },
+        {
+          "Answer": "Lemon Meringue / Lemon pie",
+          "Points": 4
+        },
+        {
+          "Answer": "Blueberry / Mixed Berry pie",
+          "Points": 3
+        },
+        {
+          "Answer": "Banana Cream / Coconut Cream pie",
+          "Points": 2
+        }
+      ]
+    },
+    {
+      "Multiplier": 2,
+      "Question": "Name something you might see in the Macy's Thanksgiving Day Parade.",
+      "Answers": [
+        {
+          "Answer": "Floats / Giant character balloons",
+          "Points": 48
+        },
+        {
+          "Answer": "Marching bands",
+          "Points": 23
+        },
+        {
+          "Answer": "Santa Claus",
+          "Points": 16
+        },
+        {
+          "Answer": "Celebrity Performers / Rockettes / Dancers",
+          "Points": 7
+        },
+        {
+          "Answer": "Clowns / Confetti",
+          "Points": 4
+        },
+        {
+          "Answer": "Cheerleaders",
+          "Points": 2
+        }
+      ]
+    },
+    {
+      "Multiplier": 3,
+      "Question": "Name a disaster that could ruin Thanksgiving dinner.",
+      "Answers": [
+        {
+          "Answer": "Burnt / Ruined turkey",
+          "Points": 45
+        },
+        {
+          "Answer": "Family argument / Fight",
+          "Points": 24
+        },
+        {
+          "Answer": "Kitchen fire / Smoke alarm",
+          "Points": 14
+        },
+        {
+          "Answer": "Oven / Stove breaks down",
+          "Points": 8
+        },
+        {
+          "Answer": "Food poisoning / Sickness",
+          "Points": 5
+        },
+        {
+          "Answer": "Power outage",
+          "Points": 4
+        }
+      ]
+    }
+  ],
+  "FastMoneyQuestions": [
+    {
+      "QuestionId": 1,
+      "Question": "Name something people say they are thankful for on Thanksgiving.",
+      "Answers": [
+        { "Answer": "Family / Children / Spouse", "Points": 48 },
+        { "Answer": "Health / Life / Being alive", "Points": 24 },
+        { "Answer": "Good friends", "Points": 13 },
+        { "Answer": "Food on the table", "Points": 8 },
+        { "Answer": "Home / Shelter", "Points": 4 },
+        { "Answer": "Job / Employment", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 2,
+      "Question": "Give me a number of days you continue eating Thanksgiving leftovers.",
+      "Answers": [
+        { "Answer": "3 days", "Points": 37 },
+        { "Answer": "2 days / A couple days", "Points": 29 },
+        { "Answer": "4 days", "Points": 16 },
+        { "Answer": "1 day", "Points": 9 },
+        { "Answer": "5 days", "Points": 6 },
+        { "Answer": "7 days (A whole week)", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 3,
+      "Question": "Name a part of the turkey people argue over at the dinner table.",
+      "Answers": [
+        { "Answer": "Drumstick / Leg", "Points": 44 },
+        { "Answer": "Wishbone", "Points": 26 },
+        { "Answer": "Breast", "Points": 16 },
+        { "Answer": "Thigh", "Points": 8 },
+        { "Answer": "Wing", "Points": 4 },
+        { "Answer": "Skin", "Points": 2 }
+      ]
+    },
+    {
+      "QuestionId": 4,
+      "Question": "Name an excuse people use to avoid helping with Thanksgiving dishes.",
+      "Answers": [
+        { "Answer": "Watching football / Watching TV", "Points": 41 },
+        { "Answer": "Too full / Food coma / Tired / Need a nap", "Points": 28 },
+        { "Answer": "I cooked the meal", "Points": 17 },
+        { "Answer": "Have to use the bathroom", "Points": 7 },
+        { "Answer": "Have to tend to the kids", "Points": 4 },
+        { "Answer": "I'll do them later / Tomorrow", "Points": 3 }
+      ]
+    },
+    {
+      "QuestionId": 5,
+      "Question": "Name an NFL team you frequently see playing on Thanksgiving Day.",
+      "Answers": [
+        { "Answer": "Dallas Cowboys", "Points": 55 },
+        { "Answer": "Detroit Lions", "Points": 31 },
+        { "Answer": "Green Bay Packers", "Points": 6 },
+        { "Answer": "Chicago Bears", "Points": 4 },
+        { "Answer": "New York Giants", "Points": 2 },
+        { "Answer": "Minnesota Vikings", "Points": 2 }
+      ]
+    }
+  ]
+}
