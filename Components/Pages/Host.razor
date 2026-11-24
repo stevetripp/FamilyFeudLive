@@ -432,9 +432,6 @@
                         <div class="display-3 fw-bold @(GameState.FastMoney.TimeRemaining <= 5 && GameState.FastMoney.TimeRemaining > 0 ? "text-danger" : "text-warning")">
                             @GameState.FastMoney.TimeRemaining<span class="fs-4">s</span>
                         </div>
-                        <div class="small text-muted">
-                            @(GameState.FastMoney.IsTimerRunning ? "⏳ COUNTDOWN RUNNING" : "⏸️ STOPPED")
-                        </div>
                     </div>
 
                     <!-- Timer Controls -->
@@ -453,14 +450,6 @@
                         </div>
                     </div>
 
-                    <!-- Duplicate Buzzer Trigger -->
-                    <div class="p-3 bg-danger bg-opacity-10 border border-danger rounded mb-3 text-center">
-                        <div class="text-danger small fw-bold mb-2">DUPLICATE ANSWER SOUND (PLAYER 2)</div>
-                        <button class="btn btn-danger w-100 fw-bold"
-                                @onclick='() => GameState.TriggerDuplicateBuzz()'>
-                            🚨 Duplicate Buzz ("Try Again!")
-                        </button>
-                    </div>
 
                     <!-- Sound FX -->
                     <div class="btn-group btn-group-sm w-100">
