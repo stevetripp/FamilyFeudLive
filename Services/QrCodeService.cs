@@ -92,6 +92,16 @@ public class QrCodeService
         return baseUrl;
     }
 
+    public string BuildFastMoneyPlayerUrl(string currentUri)
+    {
+        return BuildUrl(currentUri, "/fastmoney-player");
+    }
+
+    public string BuildFastMoneyQuestionsUrl(string currentUri)
+    {
+        return BuildUrl(currentUri, "/fastmoney-questions");
+    }
+
     public string GenerateSvgQrCode(string url)
     {
         using var qrGenerator = new QRCodeGenerator();

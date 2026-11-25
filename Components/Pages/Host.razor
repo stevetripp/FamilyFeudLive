@@ -412,49 +412,87 @@
             <div class="col-lg-4">
                 <!-- Active Player & Clock Card -->
                 <div class="fm-host-card border-info">
-                    <h5 class="fw-bold text-info mb-3">⏱️ Clock & Turn Control</h5>
+                    <h5 class="fw-bold text-info mb-3">⏱️ Fast Money Blitz Controller</h5>
 
                     <!-- Player Switcher -->
                     <div class="btn-group w-100 mb-3">
                         <button class="btn @(GameState.FastMoney.CurrentPlayer == 1 ? "btn-info text-dark fw-bold" : "btn-outline-secondary text-light")"
                                 @onclick="() => GameState.SetFastMoneyPlayer(1)">
-                            👤 Player 1 (20s)
+                            👤 Player 1 (3s Blitz)
                         </button>
                         <button class="btn @(GameState.FastMoney.CurrentPlayer == 2 ? "btn-info text-dark fw-bold" : "btn-outline-secondary text-light")"
                                 @onclick="() => GameState.SetFastMoneyPlayer(2)">
-                            👤 Player 2 (25s)
+                            👤 Player 2 (5s Blitz)
                         </button>
                     </div>
 
-                    <!-- Large Timer Display -->
-                    <div class="p-3 bg-dark rounded border text-center mb-3 @(GameState.FastMoney.IsTimerRunning ? "border-warning" : "border-secondary")">
-                        <div class="text-secondary small fw-bold">TIME REMAINING</div>
-                        <div class="display-3 fw-bold @(GameState.FastMoney.TimeRemaining <= 5 && GameState.FastMoney.TimeRemaining > 0 ? "text-danger" : "text-warning")">
-                            @GameState.FastMoney.TimeRemaining<span class="fs-4">s</span>
-                        </div>
-                    </div>
+                    <!-- Question Navigator (Q1 - Q5) -->
+                    <div class="d-flex justify-content-between gap-1 mb-3">
+                        @for (int i = 0; i < Math.Min(5, GameState.FastMoney.Questions.Count); i++)
+                        {
+                            var qIdx = i;
+                            var pList = GameState.FastMoney.CurrentPlayer == 1 ? GameState.FastMoney.Player1Answers : GameState.FastMoney.Player2Answers;
+                            var slot = qIdx < pList.Count ? pList[qIdx] : null;
+                            bool isDone = slot != null && !string.IsNullOrWhiteSpace(slot.AnswerText);
+                            bool isActive = GameState.FastMoney.ActiveQuestionIndex == qIdx;
 
-                    <!-- Timer Controls -->
-                    <div class="d-grid gap-2 mb-3">
-                        <button class="btn @(GameState.FastMoney.IsTimerRunning ? "btn-danger" : "btn-success") fw-bold py-2 fs-5"
-                                @onclick="ToggleTimer">
-                            @(GameState.FastMoney.IsTimerRunning ? "⏸ Pause Timer" : "▶ Start Timer")
-                        </button>
-
-                        <div class="btn-group">
-                            <button class="btn btn-outline-light" @onclick="() => GameState.ResetFastMoneyTimer()">
-                                🔄 Reset (@(GameState.FastMoney.CurrentPlayer == 1 ? 20 : 25)s)
+                            <button class="btn btn-sm flex-fill fw-bold @(isActive ? "btn-warning text-dark shadow" : isDone ? "btn-success" : "btn-outline-secondary text-white")"
+                                    @onclick="() => GameState.SetFastMoneyActiveQuestion(qIdx)">
+                                Q@(qIdx + 1) @(isDone ? "✓" : "")
                             </button>
-                            <button class="btn btn-outline-secondary" @onclick="() => GameState.AdjustFastMoneyTimer(-5)">-5s</button>
-                            <button class="btn btn-outline-secondary" @onclick="() => GameState.AdjustFastMoneyTimer(+5)">+5s</button>
+                        }
+                    </div>
+
+                    <!-- Question Timer & Trigger Box -->
+                    <div class="p-3 bg-dark rounded border text-center mb-3 @(GameState.FastMoney.IsQuestionTimerRunning ? "border-warning" : "border-secondary")">
+                        <div class="text-secondary small fw-bold">
+                            QUESTION @(GameState.FastMoney.ActiveQuestionIndex + 1) TIMER (@(GameState.FastMoney.CurrentPlayer == 1 ? "3s" : "5s"))
+                        </div>
+                        <div class="display-3 fw-bold @(GameState.FastMoney.QuestionTimeRemaining <= 1.0 && GameState.FastMoney.QuestionTimeRemaining > 0 ? "text-danger" : "text-warning")">
+                            @GameState.FastMoney.QuestionTimeRemaining.ToString("0.0")<span class="fs-4">s</span>
+                        </div>
+                        <div class="small fw-bold @(GameState.FastMoney.QuestionPhase == "Answering" ? "text-warning animate__animated animate__pulse animate__infinite" : "text-muted")">
+                            Status: @GameState.FastMoney.QuestionPhase
                         </div>
                     </div>
 
+                    <!-- Interactive Question Timer Controls -->
+                    <div class="d-grid gap-2 mb-3">
+                        @if (GameState.FastMoney.QuestionPhase == "Waiting")
+                        {
+                            <button class="btn btn-success fw-bold py-2 fs-5 shadow"
+                                    @onclick="() => GameState.StartFastMoneyQuestionTimer()">
+                                ▶ Start @(GameState.FastMoney.CurrentPlayer == 1 ? "3s" : "5s") Timer
+                            </button>
+                        }
+                        else if (GameState.FastMoney.QuestionPhase == "Answering")
+                        {
+                            <button class="btn btn-danger fw-bold py-2 fs-5"
+                                    @onclick="() => GameState.StopFastMoneyQuestionTimer()">
+                                ⏹ Stop / Cancel Timer
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary flex-fill fw-bold"
+                                        disabled="@(GameState.FastMoney.ActiveQuestionIndex + 1 >= Math.Min(5, GameState.FastMoney.Questions.Count))"
+                                        @onclick="() => GameState.NextFastMoneyActiveQuestion()">
+                                    Next Question ▶
+                                </button>
+                                <button class="btn btn-outline-secondary"
+                                        @onclick="() => GameState.ResetFastMoneyCurrentQuestion()">
+                                    🔄 Restart Q@(GameState.FastMoney.ActiveQuestionIndex + 1)
+                                </button>
+                            </div>
+                        }
+                    </div>
 
                     <!-- Sound FX -->
                     <div class="btn-group btn-group-sm w-100">
                         <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playDing")'>🔔 Ding</button>
                         <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playStrike")'>❌ Strike</button>
+                        <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playDuplicate")'>⚠️ Duplicate</button>
                         <button class="btn btn-outline-secondary" @onclick='() => JS.InvokeVoidAsync("feudAudio.playWin")'>🎺 Fanfare</button>
                     </div>
                 </div>
@@ -519,28 +557,53 @@
                     </div>
                 </div>
 
-                <!-- Phone Reader QR Code Card -->
+                <!-- Phone Access QR Code Card (Host PQR & Contestant) -->
                 <div class="fm-host-card border-warning text-center">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h6 class="fw-bold text-warning mb-0">📲 Phone Question Reader</h6>
-                        <span class="badge bg-warning text-dark small">Host Card</span>
-                    </div>
-                    <div class="small text-secondary mb-2">
-                        Scan with your phone to read questions to contestants:
-                    </div>
-
-                    <div class="fm-qr-graphic shadow-sm mb-2">
-                        @if (!string.IsNullOrEmpty(_fastMoneyQrCodeSvg))
-                        {
-                            @((MarkupString)_fastMoneyQrCodeSvg)
-                        }
+                    <div class="btn-group btn-group-sm w-100 mb-2">
+                        <button class="btn @(!_showContestantQr ? "btn-warning text-dark fw-bold" : "btn-outline-secondary text-white")"
+                                @onclick="() => _showContestantQr = false">
+                            📲 Host Question Reader
+                        </button>
+                        <button class="btn @(_showContestantQr ? "btn-warning text-dark fw-bold" : "btn-outline-secondary text-white")"
+                                @onclick="() => _showContestantQr = true">
+                            📱 Contestant Phone
+                        </button>
                     </div>
 
-                    <div class="mb-2">
-                        <a href="@_fastMoneyQuestionsUrl" target="_blank" class="badge bg-dark border border-secondary text-info text-decoration-none small font-monospace px-2 py-1 user-select-all">
-                            @_fastMoneyQuestionsUrl ↗
-                        </a>
-                    </div>
+                    @if (!_showContestantQr)
+                    {
+                        <div class="small text-secondary mb-2">
+                            Scan with phone to read questions to contestants:
+                        </div>
+                        <div class="fm-qr-graphic shadow-sm mb-2">
+                            @if (!string.IsNullOrEmpty(_fastMoneyQrCodeSvg))
+                            {
+                                @((MarkupString)_fastMoneyQrCodeSvg)
+                            }
+                        </div>
+                        <div class="mb-2">
+                            <a href="@_fastMoneyQuestionsUrl" target="_blank" class="badge bg-dark border border-secondary text-info text-decoration-none small font-monospace px-2 py-1 user-select-all">
+                                @_fastMoneyQuestionsUrl ↗
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="small text-secondary mb-2">
+                            Contestant scans this to answer on their phone:
+                        </div>
+                        <div class="fm-qr-graphic shadow-sm mb-2">
+                            @if (!string.IsNullOrEmpty(_fastMoneyPlayerQrSvg))
+                            {
+                                @((MarkupString)_fastMoneyPlayerQrSvg)
+                            }
+                        </div>
+                        <div class="mb-2">
+                            <a href="@_fastMoneyPlayerUrl" target="_blank" class="badge bg-dark border border-secondary text-warning text-decoration-none small font-monospace px-2 py-1 user-select-all">
+                                @_fastMoneyPlayerUrl ↗
+                            </a>
+                        </div>
+                    }
 
                     @if (_availableHostIps.Count > 1)
                     {
@@ -729,6 +792,9 @@
     private int _serverPort = 5046;
     private string _fastMoneyQuestionsUrl = string.Empty;
     private string _fastMoneyQrCodeSvg = string.Empty;
+    private string _fastMoneyPlayerUrl = string.Empty;
+    private string _fastMoneyPlayerQrSvg = string.Empty;
+    private bool _showContestantQr = false;
 
     protected override void OnInitialized()
     {
@@ -751,6 +817,8 @@
     {
         _fastMoneyQuestionsUrl = $"http://{_selectedHostIp}:{_serverPort}/fastmoney-questions";
         _fastMoneyQrCodeSvg = QrService.GenerateSvgQrCode(_fastMoneyQuestionsUrl);
+        _fastMoneyPlayerUrl = $"http://{_selectedHostIp}:{_serverPort}/fastmoney-player";
+        _fastMoneyPlayerQrSvg = QrService.GenerateSvgQrCode(_fastMoneyPlayerUrl);
     }
 
     private async void HandleStateChanged()

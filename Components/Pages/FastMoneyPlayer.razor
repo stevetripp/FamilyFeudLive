@@ -1,0 +1,250 @@
+@page "/fastmoney-player"
+@layout GameLayout
+@inject GameStateService GameState
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="fm-player-page">
+    @if (!GameState.FastMoney.IsActive)
+    {
+        <div class="card bg-dark text-white border-warning p-4 shadow-lg my-auto text-center" style="max-width: 450px; width: 100%;">
+            <div class="display-3 mb-2">⚡</div>
+            <h3 class="fw-bold text-warning mb-2">Fast Money Contestant</h3>
+            <p class="text-light opacity-75 mb-3">
+                Fast Money is not active right now.
+            </p>
+            <div class="alert alert-secondary text-light small mb-0">
+                Keep this screen open! When the host launches the Fast Money round, your screen will automatically connect.
+            </div>
+        </div>
+    }
+    else
+    {
+        var teamColor = GameState.FastMoney.WinningTeamNumber == 1 ? GameState.Team1.Color : GameState.Team2.Color;
+        var teamName = GameState.FastMoney.WinningTeamNumber == 1 ? GameState.Team1.Name : GameState.Team2.Name;
+        int activeQIndex = GameState.FastMoney.ActiveQuestionIndex;
+        var pAnswers = GameState.FastMoney.CurrentPlayer == 1 ? GameState.FastMoney.Player1Answers : GameState.FastMoney.Player2Answers;
+        var currentSlot = activeQIndex >= 0 && activeQIndex < pAnswers.Count ? pAnswers[activeQIndex] : null;
+
+        <!-- Top Header Card -->
+        <div class="fm-player-header w-100" style="max-width: 480px;">
+            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                <span class="badge p-2 fs-6 border border-light" style="background-color: @teamColor;">
+                    🏆 @teamName
+                </span>
+                <span class="badge bg-warning text-dark fw-bold fs-6">
+                    PLAYER @GameState.FastMoney.CurrentPlayer
+                </span>
+            </div>
+            <div class="text-center text-light opacity-75 small">
+                Question @(activeQIndex + 1) of @Math.Min(5, GameState.FastMoney.Questions.Count)
+            </div>
+        </div>
+
+        <div class="fm-player-card-wrapper my-auto w-100" style="max-width: 480px;">
+            @if (GameState.FastMoney.QuestionPhase == "Waiting")
+            {
+                <!-- STATE 1: WAITING FOR HOST TO READ QUESTION -->
+                <div class="card bg-dark text-white border-info p-4 text-center shadow-lg fm-state-card">
+                    <div class="fm-pulse-icon mb-3">👂</div>
+                    <h3 class="fw-bold text-info mb-2">LISTEN TO THE HOST</h3>
+                    <div class="badge bg-info text-dark fw-bold fs-6 mb-3 px-3 py-2">
+                        Question @(activeQIndex + 1)
+                    </div>
+                    <p class="text-light opacity-90 fs-5 mb-3">
+                        The host is reading your survey question aloud now.
+                    </p>
+                    <div class="p-3 bg-black bg-opacity-50 rounded border border-secondary text-secondary small">
+                        ⚡ The moment the host starts the timer, your answer choices will appear below!
+                    </div>
+                </div>
+            }
+            else if (GameState.FastMoney.QuestionPhase == "Answering")
+            {
+                <!-- STATE 2: 3s/5s BLITZ ANSWERING WINDOW -->
+                <div class="card bg-dark text-white border-warning p-3 shadow-lg fm-state-card">
+                    <!-- Timer Bar & Digits -->
+                    <div class="text-center mb-2">
+                        <div class="fm-countdown-digits @(GameState.FastMoney.QuestionTimeRemaining <= 1.0 ? "critical-pulse" : "")">
+                            @GameState.FastMoney.QuestionTimeRemaining.ToString("0.0")<span class="fs-4">s</span>
+                        </div>
+                        <div class="progress fm-timer-progress mb-2" role="progressbar">
+                            @{
+                                double pct = (GameState.FastMoney.QuestionTimeRemaining / (double)GameState.FastMoney.QuestionTimeTotal) * 100.0;
+                                string barColor = GameState.FastMoney.QuestionTimeRemaining > 1.5 ? "bg-success" : GameState.FastMoney.QuestionTimeRemaining > 0.8 ? "bg-warning" : "bg-danger";
+                            }
+                            <div class="progress-bar @barColor progress-bar-striped progress-bar-animated"
+                                 style="width: @(Math.Clamp(pct, 0, 100))%; transition: width 0.1s linear;"></div>
+                        </div>
+                        <div class="text-warning fw-bold fs-5 text-uppercase animate__animated animate__pulse animate__infinite">
+                            ⚡ TAP YOUR ANSWER NOW! ⚡
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(GameState.FastMoney.DuplicateWarningMessage))
+                    {
+                        <div class="alert alert-danger py-2 px-3 fw-bold small text-center mb-2 animate__animated animate__headShake">
+                            🚨 @GameState.FastMoney.DuplicateWarningMessage
+                        </div>
+                    }
+
+                    <!-- Answer Buttons Grid -->
+                    <div class="d-grid gap-2">
+                        @foreach (var ans in GameState.FastMoney.CurrentShuffledAnswers)
+                        {
+                            bool isDuplicate = !string.IsNullOrEmpty(GameState.FastMoney.Player2DuplicateAnswer) &&
+                                               string.Equals(GameState.FastMoney.Player2DuplicateAnswer, ans.Answer, StringComparison.OrdinalIgnoreCase);
+
+                            if (isDuplicate)
+                            {
+                                <button class="btn btn-danger btn-lg fw-bold fm-ans-btn disabled" disabled>
+                                    ❌ @ans.Answer <span class="badge bg-dark ms-1">DUPLICATE</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-warning btn-lg fw-bold text-white fm-ans-btn shadow"
+                                        @onclick="() => SelectAnswer(ans.Answer, ans.Points)">
+                                    @ans.Answer
+                                </button>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else if (GameState.FastMoney.QuestionPhase == "Answered")
+            {
+                <!-- STATE 3: LOCKED IN -->
+                <div class="card bg-dark text-white border-success p-4 text-center shadow-lg fm-state-card">
+                    <div class="display-3 text-success mb-2">✅</div>
+                    <h3 class="fw-bold text-success mb-2">ANSWER LOCKED IN!</h3>
+                    <div class="p-3 bg-success bg-opacity-25 rounded border border-success mb-3">
+                        <div class="text-secondary small fw-bold">YOUR SELECTION:</div>
+                        <div class="display-6 fw-bold text-warning">
+                            @(currentSlot?.AnswerText ?? "")
+                        </div>
+                    </div>
+                    <p class="text-light opacity-75 small mb-0">
+                        Waiting for host to review and advance to the next question...
+                    </p>
+                </div>
+            }
+            else if (GameState.FastMoney.QuestionPhase == "Expired")
+            {
+                <!-- STATE 4: TIME EXPIRED -->
+                <div class="card bg-dark text-white border-danger p-4 text-center shadow-lg fm-state-card">
+                    <div class="display-3 text-danger mb-2">⏰</div>
+                    <h3 class="fw-bold text-danger mb-2">TIME'S UP!</h3>
+                    <div class="p-3 bg-danger bg-opacity-25 rounded border border-danger mb-3">
+                        <div class="fs-5 fw-bold text-white">
+                            No answer selected in time
+                        </div>
+                        <div class="text-warning small fw-bold">0 POINTS</div>
+                    </div>
+                    <p class="text-light opacity-75 small mb-0">
+                        Waiting for host to advance to the next question...
+                    </p>
+                </div>
+            }
+        </div>
+
+        <div class="text-center text-light opacity-50 small mt-auto py-2">
+            Family Feud Live • Fast Money Contestant
+        </div>
+    }
+</div>
+
+<style>
+    .fm-player-page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        background: radial-gradient(circle at center, #1b263b 0%, #0d1b2a 100%);
+    }
+
+    .fm-state-card {
+        border-width: 2px;
+        border-radius: 16px;
+    }
+
+    .fm-countdown-digits {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: #ffc107;
+        line-height: 1;
+        text-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+    }
+
+    .critical-pulse {
+        color: #ff4d6d !important;
+        animation: fmPulse 0.4s infinite alternate;
+    }
+
+    @@keyframes fmPulse {
+        from { transform: scale(1); text-shadow: 0 0 10px #ff4d6d; }
+        to { transform: scale(1.08); text-shadow: 0 0 25px #ff4d6d; }
+    }
+
+    .fm-timer-progress {
+        height: 14px;
+        background-color: #212529;
+        border: 1px solid #495057;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .fm-ans-btn {
+        min-height: 56px;
+        font-size: 1.25rem;
+        border-width: 2px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+
+    .fm-ans-btn:active {
+        transform: scale(0.97);
+    }
+
+    .fm-pulse-icon {
+        font-size: 4rem;
+        animation: floatEar 1.5s infinite ease-in-out alternate;
+    }
+
+    @@keyframes floatEar {
+        from { transform: translateY(0px) scale(1); }
+        to { transform: translateY(-8px) scale(1.08); }
+    }
+</style>
+
+@code {
+    protected override void OnInitialized()
+    {
+        GameState.OnChange += HandleStateChanged;
+    }
+
+    private async void HandleStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void SelectAnswer(string answerText, int points)
+    {
+        GameState.SubmitFastMoneyChoice(
+            GameState.FastMoney.CurrentPlayer,
+            GameState.FastMoney.ActiveQuestionIndex,
+            answerText,
+            points
+        );
+    }
+
+    public void Dispose()
+    {
+        GameState.OnChange -= HandleStateChanged;
+    }
+}

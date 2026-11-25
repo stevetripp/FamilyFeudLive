@@ -98,6 +98,15 @@ public class FastMoneyState
     public string? DuplicateWarningMessage { get; set; }
     public long DuplicateAlertTimestamp { get; set; }
 
+    // Interactive 3s/5s Question Blitz State
+    public int ActiveQuestionIndex { get; set; } = 0;
+    public bool IsQuestionTimerRunning { get; set; }
+    public double QuestionTimeRemaining { get; set; } = 3.0;
+    public int QuestionTimeTotal { get; set; } = 3;
+    public string QuestionPhase { get; set; } = "Waiting"; // "Waiting", "Answering", "Answered", "Expired"
+    public List<FastMoneyAnswer> CurrentShuffledAnswers { get; set; } = new();
+    public string? Player2DuplicateAnswer { get; set; }
+
     public int Player1Total => Player1Answers.Where(a => a.IsPointsRevealed).Sum(a => a.Points);
     public int Player2Total => Player2Answers.Where(a => a.IsPointsRevealed).Sum(a => a.Points);
     public int CombinedRevealedTotal => Player1Total + Player2Total;

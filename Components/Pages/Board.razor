@@ -177,14 +177,36 @@ else
             <div class="fm-title-box">
                 <div class="fm-title-badge">⚡ FAST MONEY ⚡</div>
                 <div class="fm-player-indicator">
-                    @(GameState.FastMoney.CurrentPlayer == 1 ? "PLAYER 1 • 20 SECONDS" : "PLAYER 2 • 25 SECONDS")
+                    @(GameState.FastMoney.CurrentPlayer == 1 ? "PLAYER 1 • 3 SECONDS" : "PLAYER 2 • 5 SECONDS")
                 </div>
             </div>
 
+            <!-- Contestant QR Code for Phone Access -->
+            <div class="team-qr-container">
+                <a href="@_fastMoneyPlayerUrl" target="_blank" class="team-qr-link" title="@($"Join Fast Money Contestant ({_fastMoneyPlayerUrl})")">
+                    <div class="team-qr-card" style="--team-glow: #ffc107; border-color: #ffc107;">
+                        <div class="team-qr-badge" style="background-color: #ffc107; color: #000; font-weight: 900;">
+                            📱 PLAY ON PHONE
+                        </div>
+                        <div class="team-qr-graphic">
+                            @if (!string.IsNullOrEmpty(_fastMoneyPlayerQrSvg))
+                            {
+                                @((MarkupString)_fastMoneyPlayerQrSvg)
+                            }
+                        </div>
+                        <div class="team-qr-teamname" style="color: #ffc107; font-weight: 700;">
+                            Scan to Play
+                        </div>
+                    </div>
+                </a>
+            </div>
+
             <!-- Timer Display -->
-            <div class="fm-timer-card @(GameState.FastMoney.IsTimerRunning ? "running" : "") @(GameState.FastMoney.TimeRemaining <= 5 && GameState.FastMoney.TimeRemaining > 0 ? "critical" : "")">
-                <div class="fm-timer-label">CLOCK</div>
-                <div class="fm-timer-digit">@GameState.FastMoney.TimeRemaining</div>
+            <div class="fm-timer-card @(GameState.FastMoney.IsQuestionTimerRunning ? "running" : "") @(GameState.FastMoney.QuestionTimeRemaining <= 1.0 && GameState.FastMoney.QuestionTimeRemaining > 0 ? "critical" : "")">
+                <div class="fm-timer-label">@(GameState.FastMoney.IsQuestionTimerRunning ? "QUESTION CLOCK" : "CLOCK")</div>
+                <div class="fm-timer-digit">
+                    @(GameState.FastMoney.IsQuestionTimerRunning ? GameState.FastMoney.QuestionTimeRemaining.ToString("0.0") : (GameState.FastMoney.CurrentPlayer == 1 ? "3.0" : "5.0"))
+                </div>
             </div>
 
             <!-- Grand Total Score Box (Target: 200) -->
@@ -203,6 +225,31 @@ else
             </div>
         }
 
+        <!-- Active Question Survey Spotlight for Audience -->
+        @if (GameState.FastMoney.ActiveQuestionIndex >= 0 && GameState.FastMoney.ActiveQuestionIndex < GameState.FastMoney.Questions.Count)
+        {
+            var activeQ = GameState.FastMoney.Questions[GameState.FastMoney.ActiveQuestionIndex];
+            <div class="card bg-dark border-warning p-3 mb-3 text-center shadow-lg">
+                <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
+                    <span class="badge bg-warning text-dark fw-bold fs-6">
+                        QUESTION @(GameState.FastMoney.ActiveQuestionIndex + 1) OF 5
+                    </span>
+                    <span class="badge bg-info text-dark fw-bold">
+                        PLAYER @GameState.FastMoney.CurrentPlayer
+                    </span>
+                    @if (GameState.FastMoney.IsQuestionTimerRunning)
+                    {
+                        <span class="badge bg-danger fw-bold animate__animated animate__pulse animate__infinite">
+                            ⚡ 3-SECOND TIMER RUNNING ⚡
+                        </span>
+                    }
+                </div>
+                <div class="fs-4 fw-bold text-white">
+                    @activeQ.Question
+                </div>
+            </div>
+        }
+
         <!-- 5 Questions / Answers Dual Columns Board -->
         <div class="fm-grid-board my-4">
             <!-- Columns Header: Player 1 / Player 2 -->
@@ -217,7 +264,7 @@ else
                 var p1 = qIndex < GameState.FastMoney.Player1Answers.Count ? GameState.FastMoney.Player1Answers[qIndex] : null;
                 var p2 = qIndex < GameState.FastMoney.Player2Answers.Count ? GameState.FastMoney.Player2Answers[qIndex] : null;
 
-                <div class="fm-row-item">
+                <div class="fm-row-item @(qIndex == GameState.FastMoney.ActiveQuestionIndex ? "fm-row-active" : "")">
                     <!-- Player 1 Answer & Points -->
                     <div class="fm-slot p1-slot @(p1 != null && p1.IsAnswerRevealed ? "revealed" : "")">
                         <div class="fm-slot-answer">
@@ -277,6 +324,8 @@ else
     private string _team2BuzzerUrl = string.Empty;
     private string _team1QrSvg = string.Empty;
     private string _team2QrSvg = string.Empty;
+    private string _fastMoneyPlayerUrl = string.Empty;
+    private string _fastMoneyPlayerQrSvg = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -298,6 +347,8 @@ else
             _team2BuzzerUrl = QrService.BuildBuzzerUrl(Nav.Uri, "2");
             _team1QrSvg = QrService.GenerateSvgQrCode(_team1BuzzerUrl);
             _team2QrSvg = QrService.GenerateSvgQrCode(_team2BuzzerUrl);
+            _fastMoneyPlayerUrl = QrService.BuildFastMoneyPlayerUrl(Nav.Uri);
+            _fastMoneyPlayerQrSvg = QrService.GenerateSvgQrCode(_fastMoneyPlayerUrl);
         }
         catch
         {

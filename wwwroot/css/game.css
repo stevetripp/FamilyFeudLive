@@ -790,6 +790,11 @@ body.game-body {
     box-shadow: 0 0 12px rgba(245, 183, 0, 0.3);
 }
 
+.fm-row-item.fm-row-active .fm-slot {
+    border-color: #ffc107 !important;
+    box-shadow: 0 0 18px rgba(255, 193, 7, 0.7) !important;
+}
+
 .fm-slot.duplicate-highlight {
     border-color: #ef233c !important;
     box-shadow: 0 0 15px rgba(239, 35, 60, 0.7);

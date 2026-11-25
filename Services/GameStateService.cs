@@ -25,6 +25,7 @@ public class GameStateService
 
     public FastMoneyState FastMoney { get; set; } = new();
     private CancellationTokenSource? _fastMoneyTimerCts;
+    private CancellationTokenSource? _questionTimerCts;
 
     // Seasonal Theme Support
     public string CurrentTheme { get; set; } = "classic";
@@ -112,6 +113,7 @@ public class GameStateService
             FastMoney.Player1Answers.Add(new FastMoneyPlayerAnswer { QuestionIndex = i });
             FastMoney.Player2Answers.Add(new FastMoneyPlayerAnswer { QuestionIndex = i });
         }
+        SetFastMoneyActiveQuestionInternal(0);
     }
 
     private void LoadDefaultFastMoneyQuestions()
@@ -724,6 +726,7 @@ public class GameStateService
         {
             FastMoney.CurrentPlayer = playerNumber;
             StopFastMoneyTimer();
+            StopFastMoneyQuestionTimer();
             FastMoney.TimeRemaining = playerNumber == 1 ? 20 : 25;
             FastMoney.DuplicateWarningMessage = null;
 
@@ -733,6 +736,7 @@ public class GameStateService
                 q.IsRevealed = false;
             }
 
+            SetFastMoneyActiveQuestionInternal(0);
             NotifyStateChanged();
         }
     }
@@ -1072,6 +1076,7 @@ public class GameStateService
         lock (_lock)
         {
             StopFastMoneyTimer();
+            StopFastMoneyQuestionTimer();
             FastMoney.CurrentPlayer = 1;
             FastMoney.TimeRemaining = 20;
             FastMoney.DuplicateWarningMessage = null;
@@ -1080,7 +1085,275 @@ public class GameStateService
                 q.IsRevealed = false;
             }
             InitFastMoneyPlayerSlots();
+            SetFastMoneyActiveQuestionInternal(0);
             NotifyStateChanged();
+        }
+    }
+
+    // INTERACTIVE FAST MONEY (PQR + 3s/5s CONTESTANT BLITZ)
+    private void SetFastMoneyActiveQuestionInternal(int index)
+    {
+        _questionTimerCts?.Cancel();
+        FastMoney.IsQuestionTimerRunning = false;
+
+        if (index >= 0 && index < FastMoney.Questions.Count)
+        {
+            FastMoney.ActiveQuestionIndex = index;
+            FastMoney.QuestionPhase = "Waiting";
+            FastMoney.Player2DuplicateAnswer = null;
+            FastMoney.DuplicateWarningMessage = null;
+            FastMoney.QuestionTimeTotal = FastMoney.CurrentPlayer == 1 ? 3 : 5;
+            FastMoney.QuestionTimeRemaining = FastMoney.QuestionTimeTotal;
+
+            var q = FastMoney.Questions[index];
+            var rng = new Random();
+            FastMoney.CurrentShuffledAnswers = q.Answers
+                .OrderBy(_ => rng.Next())
+                .ToList();
+        }
+        else
+        {
+            FastMoney.ActiveQuestionIndex = index;
+            FastMoney.QuestionPhase = "Waiting";
+            FastMoney.CurrentShuffledAnswers.Clear();
+        }
+    }
+
+    public void SetFastMoneyActiveQuestion(int index)
+    {
+        lock (_lock)
+        {
+            SetFastMoneyActiveQuestionInternal(index);
+            NotifyStateChanged();
+        }
+    }
+
+    public void NextFastMoneyActiveQuestion()
+    {
+        lock (_lock)
+        {
+            if (FastMoney.ActiveQuestionIndex + 1 < FastMoney.Questions.Count)
+            {
+                SetFastMoneyActiveQuestionInternal(FastMoney.ActiveQuestionIndex + 1);
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public void PreviousFastMoneyActiveQuestion()
+    {
+        lock (_lock)
+        {
+            if (FastMoney.ActiveQuestionIndex > 0)
+            {
+                SetFastMoneyActiveQuestionInternal(FastMoney.ActiveQuestionIndex - 1);
+                NotifyStateChanged();
+            }
+        }
+    }
+
+    public void StartFastMoneyQuestionTimer()
+    {
+        lock (_lock)
+        {
+            if (FastMoney.IsQuestionTimerRunning) return;
+
+            int activeIdx = FastMoney.ActiveQuestionIndex;
+            if (activeIdx < 0 || activeIdx >= FastMoney.Questions.Count) return;
+
+            if (FastMoney.CurrentShuffledAnswers.Count == 0)
+            {
+                var rng = new Random();
+                FastMoney.CurrentShuffledAnswers = FastMoney.Questions[activeIdx].Answers
+                    .OrderBy(_ => rng.Next())
+                    .ToList();
+            }
+
+            FastMoney.QuestionTimeTotal = FastMoney.CurrentPlayer == 1 ? 3 : 5;
+            FastMoney.QuestionTimeRemaining = FastMoney.QuestionTimeTotal;
+            FastMoney.IsQuestionTimerRunning = true;
+            FastMoney.QuestionPhase = "Answering";
+            FastMoney.Player2DuplicateAnswer = null;
+            FastMoney.DuplicateWarningMessage = null;
+
+            _questionTimerCts?.Cancel();
+            _questionTimerCts = new CancellationTokenSource();
+            var token = _questionTimerCts.Token;
+
+            _ = Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await Task.Delay(100, token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+
+                    lock (_lock)
+                    {
+                        if (!FastMoney.IsQuestionTimerRunning || token.IsCancellationRequested) break;
+
+                        if (FastMoney.QuestionTimeRemaining > 0.1)
+                        {
+                            FastMoney.QuestionTimeRemaining = Math.Round(FastMoney.QuestionTimeRemaining - 0.1, 1);
+                            NotifyStateChanged();
+                        }
+                        else
+                        {
+                            FastMoney.QuestionTimeRemaining = 0;
+                            ExpireFastMoneyQuestionInternal();
+                            break;
+                        }
+                    }
+                }
+            }, token);
+
+            NotifyStateChanged();
+        }
+    }
+
+    public void StopFastMoneyQuestionTimer()
+    {
+        lock (_lock)
+        {
+            FastMoney.IsQuestionTimerRunning = false;
+            _questionTimerCts?.Cancel();
+            NotifyStateChanged();
+        }
+    }
+
+    public void SubmitFastMoneyChoice(int playerNum, int qIndex, string answerText, int points)
+    {
+        lock (_lock)
+        {
+            if (!FastMoney.IsQuestionTimerRunning && FastMoney.QuestionPhase != "Answering")
+            {
+                return;
+            }
+
+            // Check duplicate for Player 2
+            if (playerNum == 2 && qIndex >= 0 && qIndex < FastMoney.Player1Answers.Count)
+            {
+                var p1 = FastMoney.Player1Answers[qIndex];
+                if (!string.IsNullOrWhiteSpace(p1.AnswerText) &&
+                    string.Equals(p1.AnswerText.Trim(), answerText?.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    FastMoney.Player2DuplicateAnswer = answerText;
+                    LastDuplicateEventId = DateTime.UtcNow.Ticks;
+                    FastMoney.DuplicateWarningMessage = $"DUPLICATE ANSWER: \"{answerText?.ToUpper()}\"! PICK ANOTHER!";
+                    NotifyStateChanged();
+                    return; // Timer continues so player can tap another answer!
+                }
+            }
+
+            // Valid Answer
+            StopFastMoneyQuestionTimer();
+            FastMoney.QuestionPhase = "Answered";
+            FastMoney.Player2DuplicateAnswer = null;
+            FastMoney.DuplicateWarningMessage = null;
+
+            var list = playerNum == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            if (qIndex >= 0 && qIndex < list.Count)
+            {
+                var slot = list[qIndex];
+                slot.AnswerText = answerText?.Trim() ?? string.Empty;
+                slot.Points = points;
+                slot.IsAnswerRevealed = true; // Immediately reveal on TV!
+                slot.IsPointsRevealed = false; // Points hidden until recap!
+                slot.IsDuplicate = false;
+            }
+
+            LastDingEventId = DateTime.UtcNow.Ticks;
+            NotifyStateChanged();
+        }
+    }
+
+    private void ExpireFastMoneyQuestionInternal()
+    {
+        FastMoney.IsQuestionTimerRunning = false;
+        FastMoney.QuestionPhase = "Expired";
+        FastMoney.Player2DuplicateAnswer = null;
+
+        var list = FastMoney.CurrentPlayer == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+        if (FastMoney.ActiveQuestionIndex >= 0 && FastMoney.ActiveQuestionIndex < list.Count)
+        {
+            var slot = list[FastMoney.ActiveQuestionIndex];
+            slot.AnswerText = "[NO ANSWER]";
+            slot.Points = 0;
+            slot.IsAnswerRevealed = true; // Show [NO ANSWER] on TV
+            slot.IsPointsRevealed = false;
+            slot.IsDuplicate = false;
+        }
+
+        LastStrikeEventId = DateTime.UtcNow.Ticks;
+        NotifyStateChanged();
+    }
+
+    public void ExpireFastMoneyQuestion()
+    {
+        lock (_lock)
+        {
+            ExpireFastMoneyQuestionInternal();
+        }
+    }
+
+    public void ResetFastMoneyCurrentQuestion()
+    {
+        lock (_lock)
+        {
+            StopFastMoneyQuestionTimer();
+            FastMoney.QuestionPhase = "Waiting";
+            FastMoney.Player2DuplicateAnswer = null;
+            FastMoney.DuplicateWarningMessage = null;
+            FastMoney.QuestionTimeTotal = FastMoney.CurrentPlayer == 1 ? 3 : 5;
+            FastMoney.QuestionTimeRemaining = FastMoney.QuestionTimeTotal;
+
+            var list = FastMoney.CurrentPlayer == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            if (FastMoney.ActiveQuestionIndex >= 0 && FastMoney.ActiveQuestionIndex < list.Count)
+            {
+                var slot = list[FastMoney.ActiveQuestionIndex];
+                slot.AnswerText = string.Empty;
+                slot.Points = 0;
+                slot.IsAnswerRevealed = false;
+                slot.IsPointsRevealed = false;
+                slot.IsDuplicate = false;
+            }
+
+            if (FastMoney.ActiveQuestionIndex >= 0 && FastMoney.ActiveQuestionIndex < FastMoney.Questions.Count)
+            {
+                var rng = new Random();
+                FastMoney.CurrentShuffledAnswers = FastMoney.Questions[FastMoney.ActiveQuestionIndex].Answers
+                    .OrderBy(_ => rng.Next())
+                    .ToList();
+            }
+
+            NotifyStateChanged();
+        }
+    }
+
+    public void RevealFastMoneyPointsStep(int playerNumber, int questionIndex)
+    {
+        lock (_lock)
+        {
+            var list = playerNumber == 1 ? FastMoney.Player1Answers : FastMoney.Player2Answers;
+            if (questionIndex >= 0 && questionIndex < list.Count)
+            {
+                var slot = list[questionIndex];
+                if (!slot.IsPointsRevealed)
+                {
+                    slot.IsPointsRevealed = true;
+                    LastDingEventId = DateTime.UtcNow.Ticks;
+                    if (FastMoney.HasWonGrandPrize)
+                    {
+                        LastWinEventId = DateTime.UtcNow.Ticks;
+                    }
+                    NotifyStateChanged();
+                }
+            }
         }
     }
 
