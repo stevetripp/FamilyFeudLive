@@ -445,6 +445,23 @@
 
                     <!-- Question Timer & Trigger Box -->
                     <div class="p-3 bg-dark rounded border text-center mb-3 @(GameState.FastMoney.IsQuestionTimerRunning ? "border-warning" : "border-secondary")">
+                        @{
+                            var currQ = GameState.FastMoney.ActiveQuestionIndex >= 0 && GameState.FastMoney.ActiveQuestionIndex < GameState.FastMoney.Questions.Count
+                                ? GameState.FastMoney.Questions[GameState.FastMoney.ActiveQuestionIndex]
+                                : null;
+                        }
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary">
+                            <span class="small fw-bold text-warning">Q@(GameState.FastMoney.ActiveQuestionIndex + 1) BOARD DISPLAY:</span>
+                            <span class="badge @(currQ != null && currQ.IsRevealed ? "bg-success" : "bg-secondary")">
+                                @(currQ != null && currQ.IsRevealed ? "🟢 ON TV" : "🙈 HIDDEN ON TV")
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-sm w-100 fw-bold @(currQ != null && currQ.IsRevealed ? "btn-outline-secondary" : "btn-warning text-dark")"
+                                    @onclick="() => GameState.ToggleFastMoneyQuestionReveal(GameState.FastMoney.ActiveQuestionIndex)">
+                                @(currQ != null && currQ.IsRevealed ? "🙈 Hide Question on TV" : "👁️ Enable Question on TV")
+                            </button>
+                        </div>
                         <div class="text-secondary small fw-bold">
                             QUESTION @(GameState.FastMoney.ActiveQuestionIndex + 1) TIMER (@(GameState.FastMoney.CurrentPlayer == 1 ? "3s" : "5s"))
                         </div>
@@ -641,9 +658,20 @@
 
                     <div class="fm-host-qcard">
                         <!-- Question Header -->
-                        <div class="fm-host-qheader d-flex align-items-center gap-2">
-                            <span class="badge bg-warning text-dark fw-bold">Q@(qIndex + 1)</span>
-                            <span class="fw-bold text-light fs-6">@q.Question</span>
+                        <div class="fm-host-qheader d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning text-dark fw-bold">Q@(qIndex + 1)</span>
+                                <span class="fw-bold text-light fs-6">@q.Question</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge @(q.IsRevealed ? "bg-success" : "bg-secondary")">
+                                    @(q.IsRevealed ? "🟢 ON TV" : "🙈 HIDDEN")
+                                </span>
+                                <button class="btn btn-sm @(q.IsRevealed ? "btn-outline-secondary" : "btn-warning text-dark fw-bold")"
+                                        @onclick="() => GameState.ToggleFastMoneyQuestionReveal(qIndex)">
+                                    @(q.IsRevealed ? "🙈 Hide" : "👁️ Enable")
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Top Survey Answers Quick-Pick Bar -->

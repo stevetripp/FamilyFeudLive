@@ -36,3 +36,7 @@ bld/
 
 # VS Code
 .vscode/
+
+# Publish output
+[Pp]ublish/
+

@@ -747,6 +747,14 @@ public class GameStateService
         {
             if (FastMoney.IsTimerRunning) return;
             FastMoney.IsTimerRunning = true;
+            if (FastMoney.ActiveQuestionIndex >= 0 && FastMoney.ActiveQuestionIndex < FastMoney.Questions.Count)
+            {
+                if (!FastMoney.Questions[FastMoney.ActiveQuestionIndex].IsRevealed)
+                {
+                    FastMoney.Questions[FastMoney.ActiveQuestionIndex].IsRevealed = true;
+                    LastDingEventId = DateTime.UtcNow.Ticks;
+                }
+            }
             _fastMoneyTimerCts?.Cancel();
             _fastMoneyTimerCts = new CancellationTokenSource();
             var token = _fastMoneyTimerCts.Token;
@@ -1046,6 +1054,39 @@ public class GameStateService
         }
     }
 
+    public void RevealFastMoneyQuestion(int questionIndex)
+    {
+        lock (_lock)
+        {
+            if (questionIndex >= 0 && questionIndex < FastMoney.Questions.Count)
+            {
+                var q = FastMoney.Questions[questionIndex];
+                if (!q.IsRevealed)
+                {
+                    q.IsRevealed = true;
+                    LastDingEventId = DateTime.UtcNow.Ticks;
+                    NotifyStateChanged();
+                }
+            }
+        }
+    }
+
+    public void HideFastMoneyQuestion(int questionIndex)
+    {
+        lock (_lock)
+        {
+            if (questionIndex >= 0 && questionIndex < FastMoney.Questions.Count)
+            {
+                var q = FastMoney.Questions[questionIndex];
+                if (q.IsRevealed)
+                {
+                    q.IsRevealed = false;
+                    NotifyStateChanged();
+                }
+            }
+        }
+    }
+
     public void RevealAllFastMoneyQuestions()
     {
         lock (_lock)
@@ -1160,6 +1201,13 @@ public class GameStateService
 
             int activeIdx = FastMoney.ActiveQuestionIndex;
             if (activeIdx < 0 || activeIdx >= FastMoney.Questions.Count) return;
+
+            // Automatically reveal the question on the board when countdown timer is enabled
+            if (!FastMoney.Questions[activeIdx].IsRevealed)
+            {
+                FastMoney.Questions[activeIdx].IsRevealed = true;
+                LastDingEventId = DateTime.UtcNow.Ticks;
+            }
 
             if (FastMoney.CurrentShuffledAnswers.Count == 0)
             {
@@ -1325,6 +1373,7 @@ public class GameStateService
 
             if (FastMoney.ActiveQuestionIndex >= 0 && FastMoney.ActiveQuestionIndex < FastMoney.Questions.Count)
             {
+                FastMoney.Questions[FastMoney.ActiveQuestionIndex].IsRevealed = false;
                 var rng = new Random();
                 FastMoney.CurrentShuffledAnswers = FastMoney.Questions[FastMoney.ActiveQuestionIndex].Answers
                     .OrderBy(_ => rng.Next())

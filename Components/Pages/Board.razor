@@ -229,25 +229,14 @@ else
         @if (GameState.FastMoney.ActiveQuestionIndex >= 0 && GameState.FastMoney.ActiveQuestionIndex < GameState.FastMoney.Questions.Count)
         {
             var activeQ = GameState.FastMoney.Questions[GameState.FastMoney.ActiveQuestionIndex];
-            <div class="card bg-dark border-warning p-3 mb-3 text-center shadow-lg">
-                <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
-                    <span class="badge bg-warning text-dark fw-bold fs-6">
-                        QUESTION @(GameState.FastMoney.ActiveQuestionIndex + 1) OF 5
-                    </span>
-                    <span class="badge bg-info text-dark fw-bold">
-                        PLAYER @GameState.FastMoney.CurrentPlayer
-                    </span>
-                    @if (GameState.FastMoney.IsQuestionTimerRunning)
-                    {
-                        <span class="badge bg-danger fw-bold animate__animated animate__pulse animate__infinite">
-                            ⚡ 3-SECOND TIMER RUNNING ⚡
-                        </span>
-                    }
+            @if (activeQ.IsRevealed)
+            {
+                <div class="card bg-dark border-warning p-3 mb-3 text-center shadow-lg">
+                    <div class="fs-4 fw-bold text-white">
+                        @activeQ.Question
+                    </div>
                 </div>
-                <div class="fs-4 fw-bold text-white">
-                    @activeQ.Question
-                </div>
-            </div>
+            }
         }
 
         <!-- 5 Questions / Answers Dual Columns Board -->
